@@ -3,6 +3,8 @@ import { CircuitElementDefinition } from '../types';
 const COMPONENT_DEFINITIONS: { [key: string]: CircuitElementDefinition } = {
   AndGate: {
     typeId: 'AndGate',
+    label: 'And Gate',
+    color: 'red',
     width: 50,
     height: 150,
     inputs: [
@@ -23,3 +25,5 @@ const COMPONENT_DEFINITIONS: { [key: string]: CircuitElementDefinition } = {
     ],
   },
 };
+
+export { COMPONENT_DEFINITIONS };

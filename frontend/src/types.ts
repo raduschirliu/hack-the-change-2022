@@ -43,6 +43,7 @@ export type CircuitElementIO = {
 
 export type CircuitElementDefinition = {
   typeId: string;
+  label: string;
   // Width in pixels
   width: number;
   // Height in pixels

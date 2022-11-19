@@ -5,14 +5,14 @@ import { CircuitElement } from '../../types';
 
 interface CircuitCanvasProps {
   circuitState: CircuitElement[];
-  addComponent: (type: string) => void;
-  setToolMode: (toolMode: string) => void;
+  // addComponent: (type: string) => void;
+  // setToolMode: (toolMode: string) => void;
 }
 
 export default function CircuitCanvas({
   circuitState,
-  addComponent,
-  setToolMode,
+  // addComponent,
+  // setToolMode,
 }: CircuitCanvasProps) {
   const twoDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<CircuitEditor | null>(null);
