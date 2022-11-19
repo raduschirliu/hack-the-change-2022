@@ -4,7 +4,7 @@ type ClientMessage struct {
 	RequestId  string             `json:"requestId" bson:"requestId"`
 	DocumentId string             `json:"documentId" bson:"documentId"`
 	UserId     string             `json:"userId" bson:"userId"`
-	Type       string             `json:"type" bson:"type"`
+	Type       string             `json:"type" bson:"type"` // "update" | "delete" | "create"
 	TargetId   string             `json:"targetId" bson:"targetId"`
-	Data       CreateOrUpdateData `json:"data" bson:"data"`
+	Data       CreateOrUpdateData `json:"data" bson:"data"` // Could be either CreateData or UpdateData
 }
