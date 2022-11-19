@@ -1,0 +1,11 @@
+name: Update Prod Server
+on: [push]
+jobs:
+  - name: Do Da Thing
+    uses: appleboy/ssh-action@master
+    with:
+      host: ${{ secrets.HOST }}
+      username: ${{ secrets.USERNAME }}
+      key: ${{ secrets.KEY }}
+      port: ${{ secrets.PORT }}
+      script: whoami
