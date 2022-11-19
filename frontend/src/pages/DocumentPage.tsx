@@ -114,7 +114,7 @@ export default function DocumentPage() {
   };
 
   return (
-    <div>
+    <div className="w-screen h-screen">
       <CircuitCanvas circuitState={circuitState} />
     </div>
   );
