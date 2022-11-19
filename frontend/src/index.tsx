@@ -2,7 +2,7 @@ import './App.css';
 import './index.css';
 import 'tw-elements';
 
-import { Route, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import DocumentPage from './pages/DocumentPage';
 import { Provider } from 'react-redux';
