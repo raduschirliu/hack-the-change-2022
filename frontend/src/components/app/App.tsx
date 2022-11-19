@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import logo from '../../res/logo.svg';
-import { Counter } from '../counter/Counter';
 import './App.css';
+
+import React, { useEffect, useState } from 'react';
+
+import { Counter } from '../counter/Counter';
+import logo from '../../res/logo.svg';
+import useWebSocket from 'react-use-websocket';
 
 const API_URL = process.env['REACT_APP_API_URL'];
 
 function App() {
   console.log(API_URL);
+  const socketUrl = 'ws://' + API_URL + '/ws';
 
   const [ws, setWs] = useState(new WebSocket(`ws://${API_URL}/ws`));
 
@@ -19,6 +23,22 @@ function App() {
   ws.addEventListener('message', (data: any) => {
     console.log('got msg', data);
   });
+  const onMessage = (event: MessageEvent) => {
+    console.log('got msg', event);
+  };
+
+  const { sendMessage, sendJsonMessage } = useWebSocket(socketUrl, {
+    onOpen: () => console.log('opened'),
+    onMessage: onMessage,
+    // Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (closeEvent) => true,
+  });
+
+  useEffect(() => {
+    setInterval(() => {
+      sendMessage('hello pls');
+    }, 1000);
+  }, []);
 
   return (
     <div className="App">
