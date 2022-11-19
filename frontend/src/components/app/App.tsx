@@ -3,8 +3,7 @@ import './App.css';
 import { Counter } from '../counter/Counter';
 import logo from '../../res/logo.svg';
 import useWebSocket from 'react-use-websocket';
-import { PartsMenu } from '../menu/PartsMenu';
-import { ToolsMenu } from '../menu/ToolsMenu';
+
 
 const API_URL = process.env['REACT_APP_API_URL'];
 
@@ -25,8 +24,7 @@ function App() {
 
   return (
     <div className="App">
-      <ToolsMenu />
-      <PartsMenu />
+
     </div>
   );
 }
