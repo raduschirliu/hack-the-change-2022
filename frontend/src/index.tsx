@@ -1,6 +1,5 @@
 import './App.css';
 import './index.css';
-import 'tw-elements';
 
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
