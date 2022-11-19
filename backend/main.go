@@ -44,6 +44,7 @@ func main() {
 		D: db,
 	}
 
+	handlers.WSInit()
 	router.GET("/ws", h.TestWebsocketHandler)
 	routes.RegisterAPIRoutes(router, db)
 	router.Run(port)
