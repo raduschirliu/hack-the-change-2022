@@ -34,7 +34,7 @@
   cursor: pointer;
   background-color: rgba(112, 76, 182, 0.1);
   border-radius: 2px;
-  transition: all 0.15s;
+  /* transition: all 0.15s; */
 }
 
 .textbox {
@@ -69,11 +69,11 @@
   left: 0;
   top: 0;
   opacity: 0;
-  transition: width 1s linear, opacity 0.5s ease 1s;
+  /* transition: width 1s linear, opacity 0.5s ease 1s; */
 }
 
 .asyncButton:active:after {
   width: 0%;
   opacity: 1;
-  transition: 0s;
+  /* transition: 0s; */
 }
