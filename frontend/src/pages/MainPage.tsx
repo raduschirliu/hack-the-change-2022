@@ -29,9 +29,11 @@ export default function RootPage() {
           <p>Error! {error.message}</p>
         ) : (
           data.map((doc, index) => (
-            <Link key={index} to={`/document/${doc.uuid}`}>
-              {doc.uuid}
-            </Link>
+            <div key={index}>
+              <Link key={index} to={`/document/${doc.uuid}`}>
+                {doc.uuid}
+              </Link>
+            </div>
           ))
         )}
       </div>
