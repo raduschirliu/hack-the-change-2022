@@ -1,5 +1,8 @@
 name: Update Prod Server
-on: [push]
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
     name: Build
