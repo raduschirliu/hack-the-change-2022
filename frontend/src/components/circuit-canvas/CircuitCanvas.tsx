@@ -7,9 +7,15 @@ type Group = Two.Group;
 // @ts-ignore
 type Vector = Two.Vector;
 
+const MOUSE_LEFT_BUTTON = 0;
+const MOUSE_MIDDLE_BUTTON = 1;
+
 interface ITwoRef {
   two: Two;
   stage: Group;
+  mousePos: Vector;
+  isMoving: boolean;
+  zui: ZUI;
 }
 
 export default function CircuitCanvas() {
@@ -27,18 +33,6 @@ export default function CircuitCanvas() {
     requestAnimationFrame(draw);
   }
 
-  function setupStage() {
-    if (!twoRef.current) return;
-    const two = twoRef.current.two;
-
-    const zui = new ZUI(twoRef.current.stage);
-    const mouse = new Two.Vector();
-    const touches = {};
-    const distance = 0;
-    const dragging = false;
-    zui.addLimits(0.06, 8);
-  }
-
   function convertMousePos(event: MouseEvent): Vector {
     if (!twoRef.current) return;
     const rect: DOMRect =
@@ -49,17 +43,44 @@ export default function CircuitCanvas() {
 
   function onMouseDown(event: MouseEvent) {
     if (!twoRef.current) return;
+    const state = twoRef.current;
 
     const pos = convertMousePos(event);
 
-    if (event.button === 0) {
+    if (event.button === MOUSE_LEFT_BUTTON) {
+      // Left click
       const shape = new Two.Rectangle(pos.x, pos.y, 50, 50);
       shape.stroke = 'red';
-      twoRef.current.stage.add(shape);
+      state.stage.add(shape);
+    } else if (event.button === MOUSE_MIDDLE_BUTTON) {
+      // Middle click
+      state.isMoving = true;
     }
   }
 
-  function onMouseMove(event: MouseEvent) {}
+  function onMouseUp(event: MouseEvent) {
+    if (!twoRef.current) return;
+    const state = twoRef.current;
+
+    if (event.button === MOUSE_MIDDLE_BUTTON) {
+      // Middle mouse
+      state.isMoving = false;
+    }
+  }
+
+  function onMouseMove(event: MouseEvent) {
+    if (!twoRef.current) return;
+    const state = twoRef.current;
+
+    const newPos = convertMousePos(event);
+    const deltaPos = Two.Vector.sub(newPos, state.mousePos);
+
+    if (state.isMoving) {
+      state.zui.translateSurface(deltaPos.x, deltaPos.y);
+    }
+
+    state.mousePos = newPos;
+  }
 
   function onMouseWheel(event: WheelEvent) {}
 
@@ -70,9 +91,15 @@ export default function CircuitCanvas() {
     const two = new Two({ fitted: true }).appendTo(twoDivRef.current);
     const stage = two.makeGroup();
 
+    const zui = new ZUI(stage);
+    zui.addLimits(0.06, 8);
+
     twoRef.current = {
       two,
       stage,
+      mousePos: new Two.Vector(0, 0),
+      isMoving: false,
+      zui,
     };
 
     requestAnimationFrame(draw);
@@ -81,6 +108,7 @@ export default function CircuitCanvas() {
 
     const domElement: HTMLDivElement = two.renderer.domElement;
     domElement.addEventListener('mousedown', onMouseDown);
+    domElement.addEventListener('mouseup', onMouseUp);
     domElement.addEventListener('mousemove', onMouseMove);
     domElement.addEventListener('wheel', onMouseWheel);
 
@@ -89,8 +117,6 @@ export default function CircuitCanvas() {
     // domElement.addEventListener('touchmove', touchmove, false);
     // domElement.addEventListener('touchend', touchend, false);
     // domElement.addEventListener('touchcancel', touchend, false);
-
-    setupStage();
   }, []);
 
   return <div className="w-full h-full" ref={twoDivRef}></div>;
