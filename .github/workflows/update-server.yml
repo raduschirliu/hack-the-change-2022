@@ -1,7 +1,9 @@
 name: Update Prod Server
 on: [push]
 jobs:
-  - name: Do Da Thing
+  build:
+    name: Build
+    runs-on: ubuntu-latest
     uses: appleboy/ssh-action@master
     with:
       host: ${{ secrets.HOST }}
