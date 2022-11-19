@@ -1,5 +1,6 @@
 import { ServerResponse, ServerUpdateMessage } from '../types';
 
+import { isServerResponse } from '../typeGuards';
 import useWebSocket from 'react-use-websocket';
 
 const socketUrl = `ws://${process.env['REACT_APP_API_URL']}/ws`;
@@ -11,6 +12,12 @@ export default function DocumentPage() {
     // ServerResponse (for responses to requests)
     // ServerMessageUpdate (for updates to the circuit)
     const data: ServerResponse | ServerUpdateMessage = JSON.parse(event.data);
+
+    if (isServerResponse(data)) {
+      // Handle response
+    } else {
+      // Handle update
+    }
   };
 
   const { sendJsonMessage } = useWebSocket(socketUrl, {
