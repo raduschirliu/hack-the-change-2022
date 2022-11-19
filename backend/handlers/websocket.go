@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -17,6 +18,8 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 	writer := c.Writer
 	request := c.Request
 
+	// TODO: we should change this
+	wsupgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	connection, err := wsupgrader.Upgrade(writer, request, nil)
 
 	if err != nil {
