@@ -23,6 +23,8 @@ let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
 socketUrl = socketUrl.replace('https', 'ws');
 socketUrl = socketUrl.replace('http', 'ws');
 
+const userId = uuid();
+
 export default function DocumentPage() {
   const { documentId } = useParams();
 
@@ -60,7 +62,7 @@ export default function DocumentPage() {
     const message: ConnectMessage = {
       type: 'connect',
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
     };
     sendJsonMessage(message);
   };
@@ -77,7 +79,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
       type: 'update',
       targetId: element.id,
       data: update,
@@ -92,7 +94,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
       type: 'create',
       data: element,
     };
@@ -106,7 +108,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
       type: 'delete',
       targetId: elementId,
     };
