@@ -13,6 +13,7 @@ const MOUSE_MIDDLE_BUTTON = 1;
 interface ITwoRef {
   two: Two;
   stage: Group;
+  overlay: Group;
   mousePos: Vector;
   isMoving: boolean;
   zui: ZUI;
@@ -49,7 +50,8 @@ export default function CircuitCanvas() {
 
     if (event.button === MOUSE_LEFT_BUTTON) {
       // Left click
-      const shape = new Two.Rectangle(pos.x, pos.y, 50, 50);
+      const surfacePos = state.zui.clientToSurface(pos.x, pos.y);
+      const shape = new Two.Rectangle(surfacePos.x, surfacePos.y, 50, 50);
       shape.stroke = 'red';
       state.stage.add(shape);
     } else if (event.button === MOUSE_MIDDLE_BUTTON) {
@@ -84,12 +86,24 @@ export default function CircuitCanvas() {
 
   function onMouseWheel(event: WheelEvent) {}
 
+  function onKeyDown(event: KeyboardEvent) {
+    if (!twoRef.current) return;
+    const state = twoRef.current.zui;
+
+    if (event.key === 'r') {
+      state.reset();
+      state.updateSurface();
+      console.log('reset');
+    }
+  }
+
   // Append Two div to the dom
   useEffect(() => {
     if (twoRef.current || !twoDivRef.current) return;
 
-    const two = new Two({ fitted: true }).appendTo(twoDivRef.current);
+    const two = new Two({ fitted: true, type: Two.Types.canvas }).appendTo(twoDivRef.current);
     const stage = two.makeGroup();
+    const overlay = two.makeGroup();
 
     const zui = new ZUI(stage);
     zui.addLimits(0.06, 8);
@@ -97,6 +111,7 @@ export default function CircuitCanvas() {
     twoRef.current = {
       two,
       stage,
+      overlay,
       mousePos: new Two.Vector(0, 0),
       isMoving: false,
       zui,
@@ -111,6 +126,7 @@ export default function CircuitCanvas() {
     domElement.addEventListener('mouseup', onMouseUp);
     domElement.addEventListener('mousemove', onMouseMove);
     domElement.addEventListener('wheel', onMouseWheel);
+    window.addEventListener('keydown', onKeyDown);
 
     // TODO: Add support for touch inputs
     // domElement.addEventListener('touchstart', touchstart, false);
