@@ -16,6 +16,8 @@ import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
+import { PartsMenu } from '../components/menu/PartsMenu';
+import { ToolsMenu } from '../components/menu/ToolsMenu';
 
 let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
 socketUrl = socketUrl.replace('https', 'ws');
@@ -114,8 +116,12 @@ export default function DocumentPage() {
   };
 
   return (
-    <div className="w-screen h-screen">
-      <CircuitCanvas circuitState={circuitState} />
+    <div className="w-screen h-screen overflow-hidden">
+      <ToolsMenu />
+      <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
+        <PartsMenu />
+        <CircuitCanvas circuitState={circuitState} />
+      </div>
     </div>
   );
 }
