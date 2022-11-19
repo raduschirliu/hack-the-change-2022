@@ -17,7 +17,7 @@ export type ClientMessage = {
   documentId: string; // The ID of the document that the message is for
   userId: string; // The ID of the user that sent the message
   type: 'update' | 'delete' | 'create'; // Action type
-  targetId: string; // The ID of the target element
+  targetId?: string; // The ID of the target element, undefined for create
   data?: UpdateData | CreateData; // Data for the action, undefined for delete
 };
 
