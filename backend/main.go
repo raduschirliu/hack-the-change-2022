@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/raduschirliu/hack-the-change-2022/handlers"
 	"github.com/spf13/viper"
 )
 
@@ -22,6 +23,10 @@ func main() {
 			"hello": "world",
 		})
 	})
+
+	h := &handlers.Handler{}
+
+	router.GET("/ws", h.TestWebsocketHandler)
 
 	router.Run(port)
 }
