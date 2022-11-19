@@ -8559,6 +8559,11 @@ tw-elements@^1.0.0-alpha12:
     popper.js "^1.16.1"
     tailwindcss "^3.0.7"
 
+two.js@^0.8.10:
+  version "0.8.10"
+  resolved "https://registry.yarnpkg.com/two.js/-/two.js-0.8.10.tgz#d01f8bb1c9401f850730a79abb9784b900ccde0b"
+  integrity sha512-Rg0jn1n/0MWdDBrW47L245GWlWpbWlJ3Cv8xFlP05pSFqUT0Wn6w4yaOcxUCzAJQGRGdtmXOW3UI2W0LEEUD9Q==
+
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/type-check/-/type-check-0.4.0.tgz"
