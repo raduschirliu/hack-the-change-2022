@@ -59,3 +59,8 @@ export type ServerUpdateMessage = {
   users: string[]; // The IDs of the users that are currently editing the document
   elements: CircuitElementUpdate[]; // The elements that have been updated
 };
+
+export type CircuitDocument = {
+  uuid: string;
+  name: string;
+};
