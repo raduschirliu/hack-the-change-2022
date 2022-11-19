@@ -1,7 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import CircuitEditor from './CircuitEditor';
 
-export default function CircuitCanvas() {
+import { CircuitElement } from '../../types';
+
+interface CircuitCanvasProps {
+  circuitState: CircuitElement[];
+}
+
+export default function CircuitCanvas({ circuitState }: CircuitCanvasProps) {
   const twoDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<CircuitEditor | null>(null);
 
