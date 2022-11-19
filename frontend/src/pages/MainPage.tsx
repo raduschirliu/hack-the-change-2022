@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import useAxios from 'axios-hooks';
 import { useState } from 'react';
 
-const documentsUrl = `http://${process.env['REACT_APP_API_URL']}/api/documents`;
+const documentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
 
 export default function RootPage() {
   const [{ data, loading, error }] = useAxios(documentsUrl);
