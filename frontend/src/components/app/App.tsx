@@ -1,9 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+import React, { useState } from 'react';
+import logo from '../../res/logo.svg';
+import { Counter } from '../counter/Counter';
 import './App.css';
 
+const API_URL = process.env['REACT_APP_API_URL'];
+
 function App() {
+  console.log(API_URL);
+
+  const [ws, setWs] = useState(new WebSocket(`ws://${API_URL}/ws`));
+
+  ws.addEventListener('open', () => {
+    console.log('websock opened');
+
+    ws.send('hello fellow web brother');
+  });
+
+  ws.addEventListener('message', (data: any) => {
+    console.log('got msg', data);
+  });
+
   return (
     <div className="App">
       <header className="App-header">
