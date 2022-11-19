@@ -1,14 +1,16 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import reportWebVitals from './reportWebVitals';
-import { createBrowserRouter, RouterProvider, Route } from 'react-router-dom';
-import RootPage from './pages/MainPage';
-import DocumentPage from './pages/DocumentPage';
-
+import './App.css';
 import './index.css';
 import 'tw-elements';
+
+import { Route, RouterProvider, createBrowserRouter } from 'react-router-dom';
+
+import DocumentPage from './pages/DocumentPage';
+import { Provider } from 'react-redux';
+import React from 'react';
+import RootPage from './pages/MainPage';
+import { createRoot } from 'react-dom/client';
+import reportWebVitals from './reportWebVitals';
+import { store } from './app/store';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
