@@ -6,11 +6,14 @@ type Group = Two.Group;
 // @ts-ignore
 type Vector = Two.Vector;
 
+const GRID_SIZE_PX = 10;
 const MOUSE_LEFT_BUTTON = 0;
 const MOUSE_MIDDLE_BUTTON = 1;
+const MOUSE_RIGHT_BUTTON = 2;
 
 class CircuitEditor {
   private two: Two;
+  private grid: Group;
   private stage: Group;
   private overlay: Group;
   private mousePos: Vector = new Two.Vector(0, 0);
@@ -21,6 +24,8 @@ class CircuitEditor {
     this.two = new Two({ fitted: true, type: Two.Types.canvas }).appendTo(
       divRef
     );
+
+    this.grid = this.two.makeGroup();
     this.stage = this.two.makeGroup();
     this.overlay = this.two.makeGroup();
 

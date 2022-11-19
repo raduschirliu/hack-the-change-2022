@@ -32,15 +32,30 @@ export type ServerResponse = {
   success: boolean; // Whether the request was successful
 };
 
+export type CircuitElementIO = {
+  id: string;
+  type: 'input' | 'output';
+  // X offset of IO port in pixels
+  xOffset: number;
+  // y offset of IO port in pixels
+  yOffset: number;
+};
+
+export type CircuitElementDefinition = {
+  typeId: string;
+  // Width in pixels
+  width: number;
+  // Height in pixels
+  height: number;
+  color: string;
+  inputs: CircuitElementIO[];
+  outputs: CircuitElementIO[];
+};
+
 export type CircuitElement = {
   id: string;
   typeId: string;
-  x: number;
-  y: number;
-  inputs: string[];
-  outputs: string[];
-  numInputs: number;
-  numOutputs: number;
+  params: { [key: string]: any };
 };
 
 export type CircuitElementUpdate = {
