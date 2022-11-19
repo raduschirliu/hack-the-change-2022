@@ -2,7 +2,6 @@ import './App.css';
 
 import { Counter } from '../counter/Counter';
 import logo from '../../res/logo.svg';
-import { useEffect } from 'react';
 import useWebSocket from 'react-use-websocket';
 
 const API_URL = process.env['REACT_APP_API_URL'];
@@ -21,12 +20,6 @@ function App() {
     // Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (closeEvent) => true,
   });
-
-  useEffect(() => {
-    setInterval(() => {
-      sendMessage('hello pls');
-    }, 1000);
-  }, []);
 
   return (
     <div className="App">
