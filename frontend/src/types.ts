@@ -7,6 +7,11 @@ export type CircuitDocument = {
   name: string;
 };
 
+export type CreateCircuitDocument = {
+  name: string;
+};
+
+
 /**
  * Defines what the IO looks like on a circuit element
  * Used in `circuitElementDefinitions.ts`

@@ -62,7 +62,7 @@ export const documentSlice = createSlice({
 
       return {
         ...state,
-        elements: updateCircuitState(state.elements, action.payload),
+        elements:updateCircuitState(state.elements, action.payload)
       };
     },
     setActiveTool: (

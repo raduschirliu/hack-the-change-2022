@@ -27,7 +27,7 @@ export default function DocumentPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      setUserId(await (await user.user.getIdToken()).substring(0, 10));
+      setUserId(await (await user.getIdToken()).substring(0, 10));
     })();
   }, [user]);
 

@@ -8,7 +8,11 @@ import { Link } from 'react-router-dom';
 import { clearUser } from '../../app/reducers/user';
 import { useAppDispatch } from '../../app/hooks';
 
-export function LandNav() {
+interface ILandNavProps {
+  shouldNotDisplayLogInOut?: boolean;
+}
+
+export const LandNav: React.FC<ILandNavProps> = (props: ILandNavProps) => {
   return (
     <nav
       className="
@@ -18,44 +22,54 @@ export function LandNav() {
         items-center
         justify-between
         py-3
-        bg-gray-100
+        bg-white
         text-gray-500
         shadow-lg
         navbar navbar-expand-lg navbar-light
         gap-x-4
       "
     >
-      <img
-        src={logo}
-        alt="our logo :)"
-        className="object-scale-down h-12 ml-4"
-        title="Home"
-      />
-      <p>App Name</p>
+      <a href="/">
+        <img
+          src={logo}
+          alt="our logo :)"
+          className="object-scale-down h-12 ml-4"
+          title="Home"
+        />
+      </a>
+      <a href="/">
+        <p className="-ml-2 text-3xl text-cyan-600 font-semibold">
+          Wired Minds
+        </p>
+      </a>
       <div className="ml-auto mr-4 flex-col space-y-1 space-x-2">
-        <Link to="/sign-in">
-          <button
-            type="button"
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            className="px-5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
-            title="Logout"
-          >
-            Login
-          </button>
-        </Link>
-        <Link to="/sign-up">
-          <button
-            type="button"
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            className="px-5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
-            title="Logout"
-          >
-            Sign Up
-          </button>
-        </Link>
+        {!props.shouldNotDisplayLogInOut && (
+          <>
+            <Link to="/sign-in">
+              <button
+                type="button"
+                data-mdb-ripple="true"
+                data-mdb-ripple-color="light"
+                className="px-5 bg-violet-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-cyan-400 hover:shadow-lg transition duration-150 ease-in-out"
+                title="Logout"
+              >
+                Login
+              </button>
+            </Link>
+            <Link to="/sign-up">
+              <button
+                type="button"
+                data-mdb-ripple="true"
+                data-mdb-ripple-color="light"
+                className="px-5 bg-violet-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-cyan-400 hover:shadow-lg transition duration-150 ease-in-out"
+                title="Logout"
+              >
+                Sign Up
+              </button>
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );
-}
+};

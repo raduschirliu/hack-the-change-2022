@@ -27,7 +27,7 @@ export function JoinNav() {
         items-center
         justify-between
         py-3
-        bg-gray-100
+        bg-white
         text-gray-500
         hover:text-gray-700
         focus:text-gray-700
@@ -49,7 +49,7 @@ export function JoinNav() {
             type="button"
             data-mdb-ripple="true"
             data-mdb-ripple-color="light"
-            className="px-5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
+            className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-violet-500 hover:shadow-lg transition duration-150 ease-in-out"
             title="Logout"
             onClick={onLogoutPress}
           >

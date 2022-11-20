@@ -25,6 +25,8 @@ import {
 } from './circuitElement';
 import { Path } from 'two.js/src/path';
 import { Anchor } from 'two.js/src/anchor';
+import { throws } from 'assert';
+import { Line } from 'two.js/src/shapes/line';
 
 export enum CursorMode {
   Default = 'default',
@@ -198,6 +200,13 @@ class CircuitEditor {
 
   private setState(newState: EditorToolState) {
     if (newState === this.toolState) return;
+
+    // Remove temp line if exists
+    if (this.toolData.state === EditorToolState.ConnectingElement) {
+      if (this.toolData.wirePath) {
+        this.toolData.wirePath.remove();
+      }
+    }
 
     switch (newState) {
       case EditorToolState.Move:
@@ -381,7 +390,6 @@ class CircuitEditor {
 
     // Create wire shape and remote temp
     this.toolData.wirePath.remove();
-    this.buildWire(wire);
 
     // Send new wire element
     this.onCircuitUpdated(wire);
@@ -423,6 +431,8 @@ class CircuitEditor {
    */
   setActiveTool(tool: EditorTool) {
     console.log('Set active tool', tool);
+
+    this.activeTool = tool;
 
     switch (tool) {
       case EditorTool.Move:
@@ -488,20 +498,25 @@ class CircuitEditor {
     sink: CircuitElementIoPortTuple;
   } | null {
     // Src / input
-    const input = wire.params.inputs[WIRE_INPUT_ID]!;
-    let srcElement = this.elements.find((e) => e.id === input.elementId);
-
-    if (!srcElement) {
-      console.error('Failed to find tuple for wire', wire);
+    const input = wire.params.inputs[WIRE_INPUT_ID];
+    if (!input) {
+      console.error('Failed to find tuple for wire - bad wire inputs');
       return null;
     }
 
-    let srcElementIo = elementDefinitions[srcElement.typeId].inputs.find(
+    let srcElement = this.elements.find((e) => e.id === input.elementId);
+    if (!srcElement) {
+      console.error('Failed to find tuple for wire - bad src elem', wire);
+      return null;
+    }
+    console.log('src element - ', srcElement);
+
+    let srcElementIo = elementDefinitions[srcElement.typeId].outputs.find(
       (i) => i.id === input.ioPortId
     );
 
     if (!srcElementIo) {
-      console.error('Failed to find tuple for wire', wire);
+      console.error('Failed to find tuple for wire - bad io elem', wire);
       return null;
     }
 
@@ -512,19 +527,23 @@ class CircuitEditor {
 
     // Sink / output
     const output = wire.params.outputs[WIRE_OUTPUT_ID]!;
-    let sinkElement = this.elements.find((e) => e.id === output.elementId);
-
-    if (!sinkElement) {
-      console.error('Failed to find tuple for wire', wire);
+    if (!output) {
+      console.error('Failed to find tuple for wire - bad wire outputs');
       return null;
     }
 
-    let sinkElementIo = elementDefinitions[sinkElement.typeId].outputs.find(
-      (i) => i.id === input.ioPortId
+    let sinkElement = this.elements.find((e) => e.id === output.elementId);
+    if (!sinkElement) {
+      console.error('Failed to find tuple for wire - bad sink elem', wire);
+      return null;
+    }
+
+    let sinkElementIo = elementDefinitions[sinkElement.typeId].inputs.find(
+      (i) => i.id === output.ioPortId
     );
 
     if (!sinkElementIo) {
-      console.error('Failed to find tuple for wire', wire);
+      console.error('Failed to find tuple for wire - bad sink io', wire);
       return null;
     }
 
@@ -544,22 +563,18 @@ class CircuitEditor {
    */
   buildWire(wire: CircuitElement) {
     // Check if wire already exists
-    if (!(wire.id in this.wirePaths)) {
-      const path = new Two.Line();
-      path.fill = elementDefinitions[WIRE_TYPE_ID].color;
-      this.stage.add(path);
+    if (wire.id in this.wirePaths) {
+      this.wirePaths[wire.id].remove();
     }
 
     // Update line path start/end positions
     const tuples = this.getWireConnectionTuples(wire);
-
     if (!tuples) {
       console.error('Failed to build wire', wire);
       return;
     }
-
+    console.log('tuples', tuples);
     const { src, sink } = tuples;
-    const path = this.wirePaths[wire.id];
     const startPos = new Vector(
       src.element.params.x + src.ioPort.xOffset,
       src.element.params.y + src.ioPort.yOffset
@@ -569,10 +584,10 @@ class CircuitEditor {
       sink.element.params.y + sink.ioPort.yOffset
     );
 
-    path.vertices = [
-      new Anchor(startPos.x, startPos.y),
-      new Anchor(endPos.x, endPos.y),
-    ];
+    let path = new Two.Line(startPos.x, startPos.y, endPos.x, endPos.y);
+    path.fill = elementDefinitions[WIRE_TYPE_ID].color;
+    this.wirePaths[wire.id] = path;
+    this.stage.add(path);
 
     console.log('built new wire shape');
   }
@@ -647,7 +662,7 @@ class CircuitEditor {
       return;
     }
 
-    // TODO(radu): Update wire shape path
+    this.buildWire(element);
   }
 
   /**
@@ -682,9 +697,6 @@ class CircuitEditor {
     this.onCircuitRemoved({
       id: element.id,
     });
-
-    // TODO(radu): Also remove connection lines
-    // TODO: Remove all connections to this element
   }
 
   /**
