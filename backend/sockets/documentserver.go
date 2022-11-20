@@ -51,7 +51,7 @@ func (pool *DocumentServer) HandleDisconnect() {
 		msg := models.ServerUpdateMessage{
 			DocumentId: pool.DocumentId,
 			Users:      users,
-			Elements:   []models.CircuitElement{},
+			Element:    models.CircuitElement{},
 		}
 		for client, _ := range pool.Clients {
 			log.Println(msg)
