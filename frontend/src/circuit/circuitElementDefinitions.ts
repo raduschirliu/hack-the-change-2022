@@ -84,6 +84,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
   },
   Input: {
     ...defaultDefinition,
+    visibleInToolbox: true,
     typeId: 'Input',
     label: 'Input',
     color: 'lightblue',
@@ -102,6 +103,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
   },
   Output: {
     ...defaultDefinition,
+    visibleInToolbox: true,
     typeId: 'Output',
     label: 'Output',
     color: 'lightgreen',

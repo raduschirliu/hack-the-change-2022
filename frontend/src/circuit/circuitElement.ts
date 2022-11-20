@@ -1,4 +1,8 @@
-import { CircuitElement, CircuitElementParams } from '../types';
+import {
+  CircuitElement,
+  CircuitElementIO,
+  CircuitElementParams,
+} from '../types';
 import elementDefinitions from './circuitElementDefinitions';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -28,6 +32,32 @@ function buildCircuitElement(typeId: string): CircuitElement | null {
     typeId,
     params,
   } as CircuitElement;
+}
+
+const WIRE_TYPE = 'Wire';
+const WIRE_INPUT_ID = 'input_0';
+const WIRE_OUTPUT_ID = 'output_0';
+
+type CircuitElementPortTuple = {
+  element: CircuitElement;
+  ioPort: CircuitElementIO;
+};
+
+function buildWireConnection(
+  start: CircuitElementPortTuple,
+  end: CircuitElementPortTuple
+): CircuitElement | null {
+  if (!start || !end) {
+    return null;
+  }
+
+  const wire = buildCircuitElement(WIRE_TYPE);
+  if (!wire) {
+    console.error('Failed to create wire for connection', start, end);
+    return null;
+  }
+
+  // wire.params.inputs[WIRE_INPUT_ID] = start.
 }
 
 export { buildCircuitElement };
