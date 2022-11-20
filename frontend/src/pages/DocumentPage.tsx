@@ -1,11 +1,16 @@
-import { ClientMessage, ServerUpdateMessage } from '../types';
+import {
+  ClientMessage,
+  ClientMessageCreateData,
+  ClientMessageUpdateData,
+  ServerUpdateMessage,
+} from '../types';
 import { isServerUpdateMessage } from '../typeGuards';
 import { useEffect, useState } from 'react';
 
 import CircuitCanvas from '../components/circuit-canvas/CircuitCanvas';
 import { CircuitSimulation } from '../circuit/circuitSimulation';
 import { JsonValue } from 'react-use-websocket/dist/lib/types';
-import { PartsMenu } from '../components/menu/PartsMenu';
+import PartsMenu from '../components/menu/PartsMenu';
 import { ToolsMenu } from '../components/menu/ToolsMenu';
 import { selectUser } from '../app/reducers/user';
 import { updateCircuitState } from '../utils';
@@ -72,6 +77,50 @@ export default function DocumentPage() {
     sendJsonMessage(message);
   };
 
+  const updateElement = (update: ClientMessageUpdateData) => {
+    const requestId = uuid();
+    const message: ClientMessage = {
+      requestId,
+      documentId,
+      userId,
+      type: 'update',
+      data: update,
+    };
+    sendJsonMessage(message as unknown as JsonValue); // Websocket lib doesn't like string[] for arrays
+
+    // TODO: Handle storing request until response is received
+  };
+
+  const createElement = (data: ClientMessageCreateData) => {
+    const requestId = uuid();
+    const message: ClientMessage = {
+      requestId: requestId,
+      documentId: documentId,
+      userId: userId,
+      type: 'create',
+      data: data,
+    };
+    sendJsonMessage(message as unknown as JsonValue); // Websocket lib doesn't like string[] for arrays
+
+    // TODO: Handle storing request until response is received
+  };
+
+  const deleteElement = (elementId: string) => {
+    const requestId = uuid();
+    const message: ClientMessage = {
+      requestId,
+      documentId,
+      userId,
+      type: 'delete',
+      data: {
+        id: elementId,
+      },
+    };
+    sendJsonMessage(message as unknown as JsonValue); // Websocket lib doesn't like string[] for arrays
+
+    // TODO: Handle storing request until response is received
+  };
+
   const { sendJsonMessage } = useWebSocket(socketUrl, {
     onOpen,
     onMessage,
@@ -92,8 +141,11 @@ export default function DocumentPage() {
       <div className="w-screen h-screen overflow-hidden">
         <ToolsMenu documentId={documentId} onPlayClick={onPlayClick} />
         <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
-          <PartsMenu />
-          <CircuitCanvas />
+          <PartsMenu createCallback={createElement} />
+          <CircuitCanvas
+            updateCallBack={updateElement}
+            deleteCallBack={deleteElement}
+          />
         </div>
       </div>
     </>
