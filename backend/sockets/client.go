@@ -68,6 +68,7 @@ func (c *Client) handleMessage(msg models.ClientMessage) {
 
 	switch msg.Type {
 	case "update":
+		log.Println("got update", msg)
 		if document.CheckCircuitElement(msg.Data.Id) {
 			docs.UpdateElement(msg.Data, document)
 			res := models.ServerUpdateMessage{
@@ -81,6 +82,7 @@ func (c *Client) handleMessage(msg models.ClientMessage) {
 
 		break
 	case "delete":
+		log.Println("got delete", msg)
 		if document.CheckCircuitElement(msg.Data.Id) {
 			docs.DeleteElement(msg.Data, document)
 			removed := models.CircuitElement{}
@@ -96,6 +98,7 @@ func (c *Client) handleMessage(msg models.ClientMessage) {
 		}
 		break
 	case "create":
+		log.Println("got create", msg)
 		docs.CreateElement(msg.Data, document)
 		res := models.ServerUpdateMessage{
 			DocumentId: msg.DocumentId,

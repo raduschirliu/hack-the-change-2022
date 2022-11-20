@@ -2,9 +2,11 @@ package database
 
 import (
 	"context"
+	"log"
 
 	"github.com/raduschirliu/hack-the-change-2022/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,14 +21,22 @@ func DocumentsCollection(c mongo.Client) DocumentCollection {
 }
 
 func (d DocumentCollection) GetDocument(uuid string) (models.Document, error) {
+	obj_id, err := primitive.ObjectIDFromHex(uuid)
+
+	if err != nil {
+		log.Println("error getting id", uuid, obj_id)
+		return models.Document{}, err
+	}
+
 	res := d.D.FindOne(context.TODO(), bson.M{
-		"_id": uuid,
+		"_id": obj_id,
 	})
 
 	var doc models.Document
-	err := res.Decode(&doc)
+	err = res.Decode(&doc)
 
 	if err != nil {
+		log.Println("error finding obj", uuid, obj_id)
 		return models.Document{}, err
 	}
 	return doc, nil
