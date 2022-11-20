@@ -1,21 +1,23 @@
+import { CircuitElementDefinition } from '../../types';
+
 interface IProps {
-  label: string,
-  onClicked: (label: string) => void,
+  circuitElement: CircuitElementDefinition;
+  onClicked: (label: string) => void;
 }
 
-export function PartButton({label, onClicked}: IProps) {
+export function PartButton({ circuitElement, onClicked }: IProps) {
   return (
     <button
       type="button"
       data-mdb-ripple="true"
       data-mdb-ripple-color="light"
       className="inline-block w-full py-10 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-      title={label}
+      title={circuitElement.label}
       onClick={() => {
-        onClicked(label);
+        onClicked(circuitElement.typeId);
       }}
     >
-      {label}
+      {circuitElement.label}
       {/* if we want SVGs in the future: make a map from button label to svg, call it in here */}
       {/* <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="download"
         className="w-3 mx-auto" role="img" xmlns="http://www.w3.org/2000/svg"

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import CircuitEditor from './CircuitEditor';
+import CircuitEditor from '../../circuit/circuitEditor';
 
 import { CircuitElement } from '../../types';
 
