@@ -53,10 +53,17 @@ export type CircuitElementDefinition = {
   outputs: CircuitElementIO[];
 };
 
+export type CircuitElementParams = {
+  x: number;
+  y: number;
+  inputs: { [key: string]: string | null };
+  outputs: { [key: string]: string | null };
+};
+
 export type CircuitElement = {
   id: string;
   typeId: string;
-  params: { [key: string]: any };
+  params: CircuitElementParams;
 };
 
 export type CircuitElementUpdate = {

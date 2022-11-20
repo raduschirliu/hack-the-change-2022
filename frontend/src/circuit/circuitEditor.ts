@@ -1,11 +1,20 @@
 import Two from 'two.js';
 import { ZUI } from 'two.js/extras/jsm/zui';
+import { CircuitElement } from '../types';
+import { buildCircuitElement } from './circuitElement';
+import elementDefinitions from './circuitElementDefinitions';
 
 // @ts-ignore
 type Group = Two.Group;
 // @ts-ignore
 type Vector = Two.Vector;
 
+export enum CircuitToolMode {
+  Pan,
+  Erase,
+}
+
+const IO_RADIUS = 5;
 const GRID_SIZE_PX = 10;
 const MOUSE_LEFT_BUTTON = 0;
 const MOUSE_MIDDLE_BUTTON = 1;
@@ -19,6 +28,8 @@ class CircuitEditor {
   private mousePos: Vector = new Two.Vector(0, 0);
   private isMoving: boolean = false;
   private zui: ZUI;
+  private elements: CircuitElement[] = [];
+  private elementShapes: { [key: string]: Group } = {};
 
   constructor(divRef: HTMLDivElement) {
     this.two = new Two({ fitted: true, type: Two.Types.canvas }).appendTo(
@@ -41,6 +52,10 @@ class CircuitEditor {
     domElement.addEventListener('wheel', this.onMouseWheel.bind(this));
     window.addEventListener('keydown', this.onKeyDown.bind(this));
 
+    this.elements = [buildCircuitElement('AndGate')!];
+
+    this.elements.forEach((element) => this.buildElement(element));
+
     this.draw();
 
     // TODO: Add support for touch inputs
@@ -50,12 +65,46 @@ class CircuitEditor {
     // domElement.addEventListener('touchcancel', touchend, false);
   }
 
-  // Redraw the canvas
+  // Draw the canvas
   draw() {
     this.two.update();
     this.two.render();
 
     requestAnimationFrame(this.draw.bind(this));
+  }
+
+  /**
+   * Draw a single circuit element
+   */
+  buildElement(element: CircuitElement) {
+    const definition = elementDefinitions[element.typeId];
+
+    console.log(element);
+    const group = this.two.makeGroup();
+    group.position = new Two.Vector(element.params.x, element.params.y);
+
+    // Main component
+    const rect = new Two.Rectangle(0, 0, definition.width, definition.height);
+    rect.fill = definition.color;
+    group.add(rect);
+
+    // Inputs
+    definition.inputs.forEach((input) => {
+      const path = new Two.Circle(input.xOffset, input.yOffset, IO_RADIUS);
+      path.fill = 'green';
+      group.add(path);
+    });
+
+    // Outputs
+    definition.outputs.forEach((output) => {
+      const path = new Two.Circle(output.xOffset, output.yOffset, IO_RADIUS);
+      path.fill = 'blue';
+      group.add(path);
+    });
+
+    // Add to stage and to element map
+    this.stage.add(group);
+    this.elementShapes[element.id] = group;
   }
 
   // Reset the camera back at (0, 0)
