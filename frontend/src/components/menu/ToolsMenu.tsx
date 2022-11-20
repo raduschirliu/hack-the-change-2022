@@ -1,15 +1,16 @@
-import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
-import { ReactComponent as Wire } from '@material-design-icons/svg/filled/edit.svg';
 import { ReactComponent as Delete } from '@material-design-icons/svg/filled/delete.svg';
-import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
-import logo from '../../res/logo.png';
+import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
 import { Link } from 'react-router-dom';
+import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
   selectActiveTool,
   setActiveTool,
 } from '../../app/reducers/documentSlice';
 import { EditorTool } from '../../circuit/circuitEditor';
+import { ReactComponent as Wire } from '@material-design-icons/svg/filled/edit.svg';
+import logo from '../../res/logo.png';
+import { clearUser } from '../../app/reducers/user';
 
 interface IProps {
   documentId: string;
@@ -27,6 +28,10 @@ export function ToolsMenu({ documentId }: IProps) {
       tool === activeTool ? 'bg-blue-700' : 'bg-gray-300'
     }`;
   }
+
+  const onLogoutPress = () => {
+    dispatch(clearUser());
+  };
 
   return (
     <nav
@@ -46,7 +51,7 @@ export function ToolsMenu({ documentId }: IProps) {
         gap-x-4
       "
     >
-      <Link to="/">
+      <Link to="/home">
         <img
           src={logo}
           alt="our logo :)"
@@ -95,18 +100,16 @@ export function ToolsMenu({ documentId }: IProps) {
         <Play className="fill-white" />
       </button>
       <div className="ml-auto mr-4 flex-col space-y-1">
-        <p>Document ID: {documentId}</p>
-        <div className="flex justify-end">
-          <button
-            type="button"
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
-            title="Logout"
-          >
-            Logout
-          </button>
-        </div>
+        <button
+          type="button"
+          data-mdb-ripple="true"
+          data-mdb-ripple-color="light"
+          className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
+          title="Logout"
+          onClick={onLogoutPress}
+        >
+          Logout
+        </button>
       </div>
     </nav>
   );
