@@ -45,9 +45,11 @@ func (d DocumentCollection) GetDocument(uuid string) (models.Document, error) {
 // Adds an element to a document
 func (d DocumentCollection) CreateElement(element models.CircuitElement, document models.Document) {
 	updated_elements := append(document.Body, element)
-	d.D.UpdateByID(context.TODO(), document.DocumentId, bson.M{
-		"elements": updated_elements,
-	})
+	marshalled_elements := bson.M{"elements": updated_elements}
+	log.Println(marshalled_elements)
+	res, err := d.D.UpdateByID(context.Background(), document.DocumentId, bson.M{"$set": marshalled_elements})
+	log.Println("Res:   ", res)
+	log.Println("Err:   ", err)
 }
 
 func (d DocumentCollection) DeleteElement(element models.CircuitElement, document models.Document) {
@@ -66,10 +68,9 @@ func (d DocumentCollection) DeleteElement(element models.CircuitElement, documen
 	updated_elements := document.Body
 	updated_elements[indexToDelete] = updated_elements[len(updated_elements)-1]
 	updated_elements = updated_elements[:len(updated_elements)-1]
+	marshalled_elements := bson.M{"elements": updated_elements}
 
-	d.D.UpdateByID(context.TODO(), document.DocumentId, bson.M{
-		"elements": updated_elements,
-	})
+	d.D.UpdateByID(context.Background(), document.DocumentId, bson.M{"$set": marshalled_elements})
 }
 
 func (d DocumentCollection) UpdateElement(element models.CircuitElement, document models.Document) {
@@ -87,8 +88,7 @@ func (d DocumentCollection) UpdateElement(element models.CircuitElement, documen
 
 	updated_elements := document.Body
 	updated_elements[indexToUpdate] = element
+	marshalled_elements := bson.M{"elements": updated_elements}
 
-	d.D.UpdateByID(context.TODO(), document.DocumentId, bson.M{
-		"elements": updated_elements,
-	})
+	d.D.UpdateByID(context.Background(), document.DocumentId, bson.M{"$set": marshalled_elements})
 }
