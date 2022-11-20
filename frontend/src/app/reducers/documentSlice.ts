@@ -1,6 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { CircuitDocument } from '../../types';
-import { RootState, AppThunk } from '../store';
 
 export interface DocumentState {
   document: CircuitDocument | null;
