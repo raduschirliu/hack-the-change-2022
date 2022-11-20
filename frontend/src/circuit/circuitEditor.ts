@@ -1,13 +1,10 @@
 import Two from 'two.js';
+import { Group } from 'two.js/src/group';
+import { Vector } from 'two.js/src/vector';
 import { ZUI } from 'two.js/extras/jsm/zui';
 import { CircuitElement } from '../types';
 import { buildCircuitElement } from './circuitElement';
 import elementDefinitions from './circuitElementDefinitions';
-
-// @ts-ignore
-type Group = Two.Group;
-// @ts-ignore
-type Vector = Two.Vector;
 
 export enum CursorMode {
   Default = 'default',
@@ -26,22 +23,22 @@ export enum EditorTool {
 
 enum EditorToolState {
   // Move tool selected
-  Move,
+  Move = 'move',
 
   // Camera panning around
-  Panning,
+  Panning = 'panning',
 
   // Element being moved
-  MovingElement,
+  MovingElement = 'movingElement',
 
   // Connect too selected
-  Connect,
+  Connect = 'connect',
 
   // Erase tool selected
-  Erase,
+  Erase = 'erase',
 
   // Simulate tool selected
-  Simulate,
+  Simulate = 'simulate',
 }
 
 type EditorToolData =
@@ -139,7 +136,7 @@ class CircuitEditor {
         break;
 
       default:
-        console.error('Unimplemented state');
+        console.error('Unimplemented state: ', newState);
         break;
     }
   }
@@ -150,6 +147,8 @@ class CircuitEditor {
       return;
     }
 
+    console.log('Start moving', element);
+
     this.toolData = {
       state: EditorToolState.MovingElement,
       element,
@@ -157,12 +156,13 @@ class CircuitEditor {
   }
 
   private stopMovingElement() {
-    if (this.toolState !== EditorToolState.MovingElement) {
+    if (this.toolData.state !== EditorToolState.MovingElement) {
       console.error('Cannot stop moving element if not currently moving');
       return;
     }
 
-    // TODO(radu): Update element position?
+    this.updateElementShape(this.toolData.element);
+    console.log('Stopped moving element');
 
     this.toolData = {
       state: EditorToolState.Move,
@@ -280,6 +280,15 @@ class CircuitEditor {
   }
 
   /**
+   * Update the Two.JS shape representation of an element
+   * @param element The element to update
+   */
+  updateElementShape(element: CircuitElement) {
+    const shape = this.elementShapes[element.id];
+    shape.position.set(element.params.x, element.params.y);
+  }
+
+  /**
    * Remove an element from the circuit
    * @param element Element to remove
    */
@@ -346,7 +355,6 @@ class CircuitEditor {
 
     if (event.button === MOUSE_LEFT_BUTTON) {
       if (this.toolState === EditorToolState.Move) {
-        // TODO(radu): Start moving action
         const target = this.getElementAtMouse();
 
         if (target) {
@@ -367,6 +375,8 @@ class CircuitEditor {
     if (event.button === MOUSE_LEFT_BUTTON) {
       if (this.toolState === EditorToolState.Panning) {
         this.stopPanning();
+      } else if (this.toolState === EditorToolState.MovingElement) {
+        this.stopMovingElement();
       }
     }
   }
@@ -377,6 +387,9 @@ class CircuitEditor {
 
     if (this.toolState === EditorToolState.Panning) {
       this.zui.translateSurface(deltaPos.x, deltaPos.y);
+    } else if (this.toolData.state === EditorToolState.MovingElement) {
+      this.toolData.element.params.x += deltaPos.x;
+      this.toolData.element.params.y += deltaPos.y;
     }
 
     this.mousePos = newPos;
