@@ -105,7 +105,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId: requestId,
       documentId: documentId,
-      userId: userId, // TODO: Replace with actual user id from store
+      userId: userId,
       type: 'create',
       data: element,
     };
