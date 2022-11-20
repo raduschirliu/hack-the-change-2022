@@ -26,7 +26,7 @@ const SignIn: React.FC = () => {
       dispatch(setFirebase(app_temp));
       setAuth(getAuth(app_temp));
     }
-  }, []);
+  }, [app, auth, dispatch]);
 
   const onSubmitPress = async () => {
     if (!auth) return;
