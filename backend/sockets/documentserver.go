@@ -24,6 +24,7 @@ func (pool *DocumentServer) Start() {
 		case client := <-pool.Unregister:
 			delete(pool.Clients, client)
 			log.Println("removed existing client", client.ID)
+
 			break
 		case message := <-pool.Broadcast:
 			log.Println("Sending message to all clients")
@@ -34,5 +35,37 @@ func (pool *DocumentServer) Start() {
 				}
 			}
 		}
+	}
+}
+
+func (pool *DocumentServer) GetUsers() []string {
+	users_list := make([]string, 0)
+	for u := range pool.Clients {
+		users_list = append(users_list, u.ID)
+	}
+	return users_list
+}
+
+func (pool *DocumentServer) HandleDisconnect() {
+	users := pool.GetUsers()
+	if len(users) > 0 {
+		msg := models.ServerUpdateMessage{
+			DocumentId: pool.DocumentId,
+			Users:      users,
+			Elements:   []models.CircuitElementUpdate{},
+		}
+		pool.Broadcast <- msg
+	} else {
+		log.Println("Stale Pool")
+	}
+}
+
+func NewDocumentServer(id string) *DocumentServer {
+	return &DocumentServer{
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Clients:    make(map[*Client]bool),
+		Broadcast:  make(chan models.ServerUpdateMessage),
+		DocumentId: id,
 	}
 }
