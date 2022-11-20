@@ -9,10 +9,52 @@ type Group = Two.Group;
 // @ts-ignore
 type Vector = Two.Vector;
 
-export enum CircuitToolMode {
-  Pan,
-  Erase,
+export enum CursorMode {
+  Default = 'default',
+  Move = 'move',
+  Pointer = 'pointer',
+  Grab = 'grab',
+  Grabbing = 'grabbing',
 }
+
+export enum EditorTool {
+  Move = 'move',
+  Connect = 'connect',
+  Erase = 'erase',
+  Simulate = 'simulate',
+}
+
+enum EditorToolState {
+  // Move tool selected
+  Move,
+
+  // Camera panning around
+  Panning,
+
+  // Element being moved
+  MovingElement,
+
+  // Connect too selected
+  Connect,
+
+  // Erase tool selected
+  Erase,
+
+  // Simulate tool selected
+  Simulate,
+}
+
+type EditorToolData =
+  | {
+      state: EditorToolState.Move;
+    }
+  | {
+      state: EditorToolState.MovingElement;
+      element: CircuitElement;
+    }
+  | {
+      state: EditorToolState.Panning;
+    };
 
 const IO_RADIUS = 5;
 const GRID_SIZE_PX = 10;
@@ -26,10 +68,19 @@ class CircuitEditor {
   private stage: Group;
   private overlay: Group;
   private mousePos: Vector = new Two.Vector(0, 0);
-  private isMoving: boolean = false;
   private zui: ZUI;
   private elements: CircuitElement[] = [];
   private elementShapes: { [key: string]: Group } = {};
+  private activeTool: EditorTool = EditorTool.Move;
+  private toolData: EditorToolData = { state: EditorToolState.Move };
+
+  get toolState(): EditorToolState {
+    return this.toolData.state;
+  }
+
+  get domElement(): HTMLCanvasElement {
+    return this.two.renderer.domElement;
+  }
 
   constructor(divRef: HTMLDivElement) {
     this.two = new Two({ fitted: true, type: Two.Types.canvas }).appendTo(
@@ -43,15 +94,15 @@ class CircuitEditor {
     this.zui = new ZUI(this.stage);
     this.zui.addLimits(0.06, 8);
 
-    console.log('initialized');
+    console.log('Initialized circuit editor');
 
-    const domElement: HTMLDivElement = this.two.renderer.domElement;
-    domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
-    domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
-    domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-    domElement.addEventListener('wheel', this.onMouseWheel.bind(this));
+    this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+    this.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+    this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+    this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this));
     window.addEventListener('keydown', this.onKeyDown.bind(this));
 
+    // TODO(radu): remove the temp circuit elem
     this.elements = [buildCircuitElement('AndGate')!];
 
     this.elements.forEach((element) => this.buildElement(element));
@@ -65,12 +116,133 @@ class CircuitEditor {
     // domElement.addEventListener('touchcancel', touchend, false);
   }
 
-  // Draw the canvas
+  /**
+   * Called every animation frame to draw the canvas
+   */
   draw() {
     this.two.update();
     this.two.render();
 
+    this.updateCursorMode();
+
     requestAnimationFrame(this.draw.bind(this));
+  }
+
+  private setState(newState: EditorToolState) {
+    if (newState === this.toolState) return;
+
+    switch (newState) {
+      case EditorToolState.Move:
+        this.toolData = {
+          state: EditorToolState.Move,
+        };
+        break;
+
+      default:
+        console.error('Unimplemented state');
+        break;
+    }
+  }
+
+  private startMovingElement(element: CircuitElement) {
+    if (this.toolState !== EditorToolState.Move) {
+      console.error('Invalid state transition to MoveElement');
+      return;
+    }
+
+    this.toolData = {
+      state: EditorToolState.MovingElement,
+      element,
+    };
+  }
+
+  private stopMovingElement() {
+    if (this.toolState !== EditorToolState.MovingElement) {
+      console.error('Cannot stop moving element if not currently moving');
+      return;
+    }
+
+    // TODO(radu): Update element position?
+
+    this.toolData = {
+      state: EditorToolState.Move,
+    };
+  }
+
+  private startPanning() {
+    if (this.toolState === EditorToolState.MovingElement) {
+      console.error('Cannot pan if moving element');
+      return;
+    }
+
+    this.toolData = {
+      state: EditorToolState.Panning,
+    };
+  }
+
+  private stopPanning() {
+    if (this.toolState !== EditorToolState.Panning) {
+      console.error('Not currently panning, cannot stop');
+      return;
+    }
+
+    // Revert to default for active tool
+    this.setActiveTool(this.activeTool);
+  }
+
+  /**
+   * Set the active editor tool
+   */
+  setActiveTool(tool: EditorTool) {
+    switch (tool) {
+      case EditorTool.Move:
+        this.setState(EditorToolState.Move);
+        break;
+
+      case EditorTool.Erase:
+        this.setState(EditorToolState.Erase);
+        break;
+
+      case EditorTool.Connect:
+        this.setState(EditorToolState.Connect);
+        break;
+
+      case EditorTool.Simulate:
+        this.setState(EditorToolState.Simulate);
+        break;
+
+      default:
+        console.error('Invalid tool', tool);
+        break;
+    }
+  }
+
+  /**
+   * Determine what the cursor should be set to
+   */
+  updateCursorMode() {
+    const cursorTarget = this.getElementAtMouse();
+    let cursor = CursorMode.Default;
+
+    switch (this.toolState) {
+      case EditorToolState.Erase:
+        if (cursorTarget) {
+          cursor = CursorMode.Pointer;
+        }
+        break;
+
+      case EditorToolState.Move:
+        if (cursorTarget) {
+          cursor = CursorMode.Grab;
+        }
+        break;
+
+      case EditorToolState.MovingElement:
+        cursor = CursorMode.Grabbing;
+        break;
+    }
+
+    this.domElement.style.cursor = cursor;
   }
 
   /**
@@ -107,38 +279,95 @@ class CircuitEditor {
     this.elementShapes[element.id] = group;
   }
 
-  // Reset the camera back at (0, 0)
+  /**
+   * Remove an element from the circuit
+   * @param element Element to remove
+   */
+  removeElement(element: CircuitElement | null) {
+    if (!element) return;
+
+    // TODO(radu): update the redux store, send info to server
+  }
+
+  /**
+   * Reset the camera back to (0, 0)
+   */
   resetCamera() {
     this.zui.reset();
     this.zui.updateSurface();
-    console.log('reset');
+    console.log('reset camera');
   }
 
+  /**
+   * Convert mouse coordinates from page to canvas
+   * @param event Mouse event to get coordinates from
+   * @returns Mouse coordinates within the canvas boundary
+   */
   convertMousePos(event: MouseEvent): Vector {
     const rect: DOMRect = this.two.renderer.domElement.getBoundingClientRect();
-
     return new Two.Vector(event.clientX - rect.left, event.clientY - rect.top);
+  }
+
+  getIoPortAtMouse() {
+    // TODO(radu): write this
+  }
+
+  /**
+   * Find the first circuit element under the user's mouse
+   * @returns The CircuitElement under the user's mouse, if any
+   */
+  getElementAtMouse(): CircuitElement | null {
+    const pos = this.zui.clientToSurface(this.mousePos.x, this.mousePos.y);
+
+    for (const [, element] of Object.entries(this.elements)) {
+      const definition = elementDefinitions[element.typeId];
+      const bounds = {
+        left: element.params.x - definition.width / 2,
+        right: element.params.x + definition.width / 2,
+        top: element.params.y - definition.height / 2,
+        bottom: element.params.y + definition.height / 2,
+      };
+
+      if (
+        pos.x >= bounds.left &&
+        pos.x <= bounds.right &&
+        pos.y >= bounds.top &&
+        pos.y <= bounds.bottom
+      ) {
+        return element;
+      }
+    }
+
+    return null;
   }
 
   onMouseDown(event: MouseEvent) {
     const pos = this.convertMousePos(event);
 
     if (event.button === MOUSE_LEFT_BUTTON) {
-      // Left click
-      const surfacePos = this.zui.clientToSurface(pos.x, pos.y);
-      const shape = new Two.Rectangle(surfacePos.x, surfacePos.y, 50, 50);
-      shape.stroke = 'red';
-      this.stage.add(shape);
-    } else if (event.button === MOUSE_MIDDLE_BUTTON) {
-      // Middle click
-      this.isMoving = true;
+      if (this.toolState === EditorToolState.Move) {
+        // TODO(radu): Start moving action
+        const target = this.getElementAtMouse();
+
+        if (target) {
+          this.startMovingElement(target);
+        } else {
+          this.startPanning();
+        }
+      } else if (this.toolState === EditorToolState.Erase) {
+        const target = this.getElementAtMouse();
+        this.removeElement(target);
+      } else if (this.toolState === EditorToolState.Connect) {
+        // TODO(radu): Determine if there is an IO pin under the mouse and start the connect action
+      }
     }
   }
 
   onMouseUp(event: MouseEvent) {
-    if (event.button === MOUSE_MIDDLE_BUTTON) {
-      // Middle mouse
-      this.isMoving = false;
+    if (event.button === MOUSE_LEFT_BUTTON) {
+      if (this.toolState === EditorToolState.Panning) {
+        this.stopPanning();
+      }
     }
   }
 
@@ -146,7 +375,7 @@ class CircuitEditor {
     const newPos = this.convertMousePos(event);
     const deltaPos = Two.Vector.sub(newPos, this.mousePos);
 
-    if (this.isMoving) {
+    if (this.toolState === EditorToolState.Panning) {
       this.zui.translateSurface(deltaPos.x, deltaPos.y);
     }
 
