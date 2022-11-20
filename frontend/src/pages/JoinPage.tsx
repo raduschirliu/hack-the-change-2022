@@ -89,8 +89,6 @@ export default function JoinPage() {
           loading={documentsLoading}
           error={documentsError}
         />
-        <hr className="my-6 border-gray-300" />
-        <p className="text-xs">Made with ❤️ by webbrothers</p>
       </div>
       {/* <!-- End jumbotron --> */}
     </div>

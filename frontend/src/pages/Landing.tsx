@@ -18,7 +18,7 @@ const getDocumentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
 
 export default function Landing() {
   return (
-    <div>
+    <div className="bg-cyan-100">
       <LandNav />
       {/* <!-- Jumbotron --> */}
       <div className="h-full p-6 shadow-lg rounded-lg bg-cyan-100 text-gray-700">
@@ -26,17 +26,44 @@ export default function Landing() {
           <img src={circuitPic} alt="circuit" className="w-1/3 p-5" />
           <div className="flex flex-col justify-center max-w-md">
             <h2 className="text-center text-3xl mb-5">
-              Welcome to our multi-player digital circuit builder!<br /><br />
-              Made for teaching kids the beginnings of electrical engineering.
+              Welcome to our multi-player digital circuit builder!
+              <br />
+              <br />A simple and fun way for teaching the beginnings of
+              electrical engineering.
             </h2>
           </div>
         </div>
-
         <hr className="my-6 border-gray-300" />
-        {/* Create new circuit */}
-        <p className="text-center">A description of our app here...</p>
+        <div className="flex flex-row justify-center space-x-16">
+          <div className="flex flex-col items-center w-1/3 space-y-2">
+            <h1 className="font-semibold text-xl">Made for Kids and Teens</h1>
+            <p>
+              We created Wired Minds with elementary and juniour high students
+              in mind. Our simple block connection design makes concepts easy to
+              grasp and fun to try out! Recently, there have been tons of
+              resources available for early Software Engineering learning. Our
+              hope is to provide a similar set of resources for Electrical
+              Engineering, continuing to inspire interest in STEM careers from
+              an early age.
+            </p>
+          </div>
+          <div className="flex flex-col items-center w-1/3 space-y-2">
+            <h1 className="font-semibold text-xl">Made for Teachers</h1>
+            <p>
+              Wired Minds replaces the need for costly and fragile circuitry
+              kits and can be ran for FREE on any computer (including
+              ChromeBooks). Our online circuitry builder also allows students to
+              "take home" their circuits, keeping the learning going beyond the
+              classroom. Best of all, unlike competitors, Wired Minds allows for
+              unlimited users to collaborate on one document, enabling
+              collaboration and group-work!
+            </p>
+          </div>
+        </div>
         <hr className="my-6 border-gray-300" />
-        <p className="text-xs">Made with ❤️ by webbrothers</p>
+        <div className="flex justify-center">
+          <p className="text-xs">Made with ❤️ by webbrothers</p>
+        </div>
       </div>
       {/* <!-- End jumbotron --> */}
     </div>
