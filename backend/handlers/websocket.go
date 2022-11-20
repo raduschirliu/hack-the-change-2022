@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/raduschirliu/hack-the-change-2022/models"
+	"github.com/raduschirliu/hack-the-change-2022/sockets"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,6 +16,8 @@ var wsupgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
+
+var Documents map[string]sockets.DocumentServer
 
 func (h Handler) TestWebsocketHandler(c *gin.Context) {
 	writer := c.Writer
@@ -45,23 +48,23 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 	response.Success = true
 	connection.WriteJSON(response)
 
-	client := &Client{
+	client := &sockets.Client{
 		ID:   message.UserId,
 		Conn: connection,
 		Pool: nil,
 	}
 
-	if _, ok := WSPools[message.DocumentId]; !ok {
-		pool := NewPool(message.DocumentId)
+	if _, ok := Documents[message.DocumentId]; !ok {
+		pool := sockets.NewDocumentServer(message.DocumentId)
 		log.Println("starting new pool for id", message.DocumentId)
 		go pool.Start()
-		WSPools[message.DocumentId] = *pool
+		Documents[message.DocumentId] = *pool
 		client.Pool = pool
 		pool.Register <- client
 		client.Read()
 	} else {
 		log.Println("have existing pool for id", message.DocumentId)
-		pool := WSPools[message.DocumentId]
+		pool := Documents[message.DocumentId]
 		client.Pool = &pool
 		pool.Register <- client
 		client.Read()
