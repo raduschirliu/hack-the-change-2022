@@ -37,9 +37,9 @@ export default function JoinPage() {
     <div>
       <JoinNav />
       {/* <!-- Jumbotron --> */}
-      <div className="h-full p-6 shadow-lg rounded-lg bg-blue-100 text-gray-700">
+      <div className="h-full p-6 shadow-lg rounded-lg bg-cyan-50 text-gray-700">
         <h2 className="text-center font-semibold text-3xl mb-5">
-          Welcome back to app name!
+          Welcome back to Wired Minds!
         </h2>
         <hr className="my-6 border-gray-300" />
         {/* Create new circuit */}
@@ -62,7 +62,7 @@ export default function JoinPage() {
                 border border-solid border-gray-300
                 rounded
                 m-0
-                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+                focus:text-gray-700 focus:bg-white focus:border-violet-600 focus:outline-none
               "
               id="exampleText0"
               placeholder="Name of your new circuit"
@@ -72,7 +72,7 @@ export default function JoinPage() {
             <div className="mt-1.5 flex justify-center">
               <button
                 type="button"
-                className="block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+                className="block px-6 py-2.5 bg-violet-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-cyan-400 hover:shadow-lg focus:bg-cyan-400 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-cyan-400 active:shadow-lg transition duration-150 ease-in-out"
                 onClick={onCreateDocumentButtonPress}
               >
                 Create
