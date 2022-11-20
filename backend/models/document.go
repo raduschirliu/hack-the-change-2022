@@ -15,3 +15,12 @@ type CreateDocumentRequest struct {
 type FindDocumentRequest struct {
 	DocumentId string `json:"uuid" bson:"_id" binding:"required"`
 }
+
+func (d Document) CheckCircuitElement(id string) bool {
+	for _, e := range d.Body {
+		if e.Id == id {
+			return true
+		}
+	}
+	return false
+}

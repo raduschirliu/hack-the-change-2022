@@ -50,9 +50,10 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 	connection.WriteJSON(response)
 
 	client := &sockets.Client{
-		ID:   message.UserId,
-		Conn: connection,
-		Pool: nil,
+		ID:       message.UserId,
+		Conn:     connection,
+		Pool:     nil,
+		Database: h.D,
 	}
 
 	if _, ok := Documents[message.DocumentId]; !ok {

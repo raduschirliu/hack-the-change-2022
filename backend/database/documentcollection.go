@@ -31,3 +31,11 @@ func (d DocumentCollection) GetDocument(uuid string) (models.Document, error) {
 	}
 	return doc, nil
 }
+
+// Adds an element to a document
+func (d DocumentCollection) CreateElement(element models.CircuitElement, document models.Document) {
+	updated_elements := append(document.Body, element)
+	d.D.UpdateByID(context.TODO(), document.DocumentId, bson.M{
+		"elements": updated_elements,
+	})
+}
