@@ -71,15 +71,13 @@ export type CircuitElement = {
 };
 
 export type CircuitElementUpdate = {
-  id: string;
-  x: number;
-  y: number;
-  inputs: string[];
-  outputs: string[];
-  typeId?: string; // Only used for create
-  numInputs?: number; // Only used for create
-  numOutputs?: number; // Only used for create
+  targetId: string;
+  params: Partial<CircuitElementParams>;
 };
+
+export type CircuitElementRemove = {
+  targetId: string;
+}
 
 export type ServerUpdateMessage = {
   documentId: string; // The ID of the document that the message is for

@@ -117,7 +117,7 @@ export default function DocumentPage() {
 
   return (
     <div className="w-screen h-screen overflow-hidden">
-      <ToolsMenu documentId={documentId}/>
+      <ToolsMenu documentId={documentId} />
       <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
         <PartsMenu />
         <CircuitCanvas circuitState={circuitState} />

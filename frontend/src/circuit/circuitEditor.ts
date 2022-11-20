@@ -2,8 +2,11 @@ import Two from 'two.js';
 import { Group } from 'two.js/src/group';
 import { Vector } from 'two.js/src/vector';
 import { ZUI } from 'two.js/extras/jsm/zui';
-import { CircuitElement } from '../types';
-import { buildCircuitElement } from './circuitElement';
+import {
+  CircuitElement,
+  CircuitElementRemove,
+  CircuitElementUpdate,
+} from '../types';
 import elementDefinitions from './circuitElementDefinitions';
 
 export enum CursorMode {
@@ -60,6 +63,14 @@ const MOUSE_MIDDLE_BUTTON = 1;
 const MOUSE_RIGHT_BUTTON = 2;
 
 class CircuitEditor {
+  /* Callbacks */
+  public onCircuitUpdated: (update: CircuitElementUpdate) => void = (
+    update
+  ) => {};
+  public onCircuitRemoved: (remove: CircuitElementRemove) => void = (
+    remove
+  ) => {};
+
   private two: Two;
   private grid: Group;
   private stage: Group;
@@ -99,11 +110,6 @@ class CircuitEditor {
     this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this));
     window.addEventListener('keydown', this.onKeyDown.bind(this));
 
-    // TODO(radu): remove the temp circuit elem
-    this.elements = [buildCircuitElement('AndGate')!];
-
-    this.elements.forEach((element) => this.buildElement(element));
-
     this.draw();
 
     // TODO: Add support for touch inputs
@@ -123,6 +129,25 @@ class CircuitEditor {
     this.updateCursorMode();
 
     requestAnimationFrame(this.draw.bind(this));
+  }
+
+  setElements(elements: CircuitElement[]) {
+    // Make a deep copy of the elements we get
+    this.elements = JSON.parse(JSON.stringify(elements));
+
+    // Remove shapes not needed anymore
+    let elementKeys = this.elements.map((element) => element.id);
+    let shapesToRemove = Object.keys(this.elementShapes).filter(
+      (key) => !elementKeys.includes(key)
+    );
+
+    for (const key in shapesToRemove) {
+      this.elementShapes[key].remove();
+      delete this.elementShapes[key];
+    }
+
+    // Build all the element shapes
+    this.elements.forEach((element) => this.buildElement(element));
   }
 
   private setState(newState: EditorToolState) {
@@ -161,8 +186,16 @@ class CircuitEditor {
       return;
     }
 
+    this.onCircuitUpdated({
+      targetId: this.toolData.element.id,
+      params: {
+        x: this.toolData.element.params.x,
+        y: this.toolData.element.params.y,
+      },
+    });
+
     this.updateElementShape(this.toolData.element);
-    console.log('Stopped moving element');
+    console.log('Stopped moving element, submitted data');
 
     this.toolData = {
       state: EditorToolState.Move,
@@ -251,7 +284,12 @@ class CircuitEditor {
   buildElement(element: CircuitElement) {
     const definition = elementDefinitions[element.typeId];
 
-    console.log(element);
+    // If the shape already exists, update it instead of making a new one
+    if (element.id in this.elementShapes) {
+      this.updateElementShape(element);
+      return;
+    }
+
     const group = this.two.makeGroup();
     group.position = new Two.Vector(element.params.x, element.params.y);
 
@@ -390,6 +428,7 @@ class CircuitEditor {
     } else if (this.toolData.state === EditorToolState.MovingElement) {
       this.toolData.element.params.x += deltaPos.x;
       this.toolData.element.params.y += deltaPos.y;
+      this.updateElementShape(this.toolData.element);
     }
 
     this.mousePos = newPos;
