@@ -24,7 +24,7 @@ import axios from 'axios';
 import { addCircuitElement } from '../app/reducers/documentSlice';
 
 let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
-socketUrl = socketUrl.replace('https', 'ws');
+socketUrl = socketUrl.replace('https', 'wss');
 socketUrl = socketUrl.replace('http', 'ws');
 const documentUrl = `${process.env['REACT_APP_API_URL']}/api/document`;
 
