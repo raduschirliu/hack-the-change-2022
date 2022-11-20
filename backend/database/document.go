@@ -2,6 +2,12 @@ package database
 
 import "go.mongodb.org/mongo-driver/mongo"
 
-func DocumentsCollection(c mongo.Client) *mongo.Collection {
-	return c.Database("hackthechange").Collection("documents")
+type DocumentCollection struct {
+	D *mongo.Collection
+}
+
+func DocumentsCollection(c mongo.Client) DocumentCollection {
+	return DocumentCollection{
+		D: c.Database("hackthechange").Collection("documents"),
+	}
 }
