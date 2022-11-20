@@ -3,7 +3,6 @@ package sockets
 import (
 	"log"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/raduschirliu/hack-the-change-2022/database"
 	"github.com/raduschirliu/hack-the-change-2022/models"
@@ -38,16 +37,18 @@ func (c *Client) Read() {
 
 		res := models.ServerUpdateMessage{
 			DocumentId: msg.DocumentId,
-			Elements:   []models.CircuitElement{},
+			Element:    models.CircuitElement{},
 			Users:      users,
 		}
-		// c.Conn.WriteJSON(res)
-		for client, _ := range c.Pool.Clients {
-			if err := client.Conn.WriteJSON(res); err != nil {
-				log.Println(err)
-				return
-			}
-		}
+
+		c.Pool.Broadcast <- res
+
+		// for client, _ := range c.Pool.Clients {
+		// 	if err := client.Conn.WriteJSON(res); err != nil {
+		// 		log.Println(err)
+		// 		return
+		// 	}
+		// }
 	}
 }
 
@@ -56,28 +57,54 @@ func (c *Client) handleMessage(msg models.ClientMessage) {
 	document, err := docs.GetDocument(msg.DocumentId)
 
 	if err != nil {
-		// TODO: handle error
+		res := models.ServerUpdateMessage{
+			DocumentId: msg.DocumentId,
+			Users:      c.Pool.GetUsers(),
+			Element:    models.CircuitElement{},
+		}
+		c.Pool.Broadcast <- res
 		return
 	}
 
 	switch msg.Type {
 	case "update":
-		if document.CheckCircuitElement(msg.TargetId) {
-			element := msg.Data.ToElement()
-			docs.UpdateElement(element, document)
+		log.Println("got update", msg)
+		if document.CheckCircuitElement(msg.Data.Id) {
+			docs.UpdateElement(msg.Data, document)
+			res := models.ServerUpdateMessage{
+				DocumentId: msg.DocumentId,
+				Users:      c.Pool.GetUsers(),
+				Element:    msg.Data,
+			}
+			c.Pool.Broadcast <- res
+			return
 		}
+
 		break
 	case "delete":
-		if document.CheckCircuitElement(msg.TargetId) {
-			element := msg.Data.ToElement()
-			docs.DeleteElement(element, document)
+		log.Println("got delete", msg)
+		if document.CheckCircuitElement(msg.Data.Id) {
+			docs.DeleteElement(msg.Data, document)
+			removed := models.CircuitElement{}
+			removed.Id = msg.Data.Id
+
+			res := models.ServerUpdateMessage{
+				DocumentId: msg.DocumentId,
+				Users:      c.Pool.GetUsers(),
+				Element:    removed,
+			}
+			c.Pool.Broadcast <- res
+			return
 		}
 		break
 	case "create":
-		insert_id := uuid.New().String()
-		element := msg.Data.ToElement()
-		element.Id = insert_id
-		docs.CreateElement(element, document)
-		// TODO: send response
+		log.Println("got create", msg)
+		docs.CreateElement(msg.Data, document)
+		res := models.ServerUpdateMessage{
+			DocumentId: msg.DocumentId,
+			Users:      c.Pool.GetUsers(),
+			Element:    msg.Data,
+		}
+		c.Pool.Broadcast <- res
 	}
 }

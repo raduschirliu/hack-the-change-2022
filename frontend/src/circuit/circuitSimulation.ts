@@ -3,6 +3,7 @@ import { store } from '../app/store';
 
 type Node = {
   id: string;
+  type: string;
   state?: boolean; // state for input nodes
   // null if this is an input node,
   // otherwise a map of input names to nodes
@@ -40,17 +41,20 @@ export class CircuitSimulation {
     for (const element of elements) {
       nodes[element.id] = {
         id: element.id,
+        type: element.typeId,
         state: element.typeId === 'Input' ? element.params.state : undefined,
         inputs: Object.fromEntries(
-          Object.entries(element.params.inputs).map(([inputName, inputId]) => [
+          Object.entries(element.params.inputs).map(([inputName, inputEl]) => [
             inputName,
-            inputId ? nodes[inputId] || inputId : null,
+            inputEl !== null
+              ? nodes[inputEl.elementId] || inputEl.elementId // If the node doesn't exist yet, use the element ID so we can resolve it later
+              : null,
           ])
         ),
         outputIds: Object.fromEntries(
-          Object.entries(element.params.inputs).map(([inputName, inputId]) => [
+          Object.entries(element.params.inputs).map(([inputName, inputEl]) => [
             inputName,
-            inputId,
+            inputEl !== null ? inputEl.elementId : null,
           ])
         ),
         truthTable: elementDefinitions[element.typeId].truthTable,
@@ -76,7 +80,7 @@ export class CircuitSimulation {
             const element = elements.find((e) => e.id === elementId);
             if (element) {
               const outputName = Object.entries(element.params.outputs).find(
-                ([, outputId]) => outputId === nodeId
+                ([, outputId]) => outputId?.elementId === nodeId
               )?.[0];
               if (outputName) {
                 node.outputIds[inputName] = outputName;
@@ -141,10 +145,10 @@ export class CircuitSimulation {
       }
 
       // Get array of inputs, sorted by name
-      const inputs = Object.keys(nodeSolution.inputs).sort();
+      const inputs = Object.keys(elementDefinitions[node.type].inputs).sort();
       // Get array of input values
-      const inputValues = inputs.map(
-        (input) => (nodeSolution.inputs ? nodeSolution.inputs[input] : false) // Should never be false, thanks TypeScript
+      const inputValues = inputs.map((input) =>
+        nodeSolution.inputs ? nodeSolution.inputs[input] ?? false : false
       );
       // Convert input values to a string of 1s and 0s
       const inputValuesString = inputValues
@@ -209,10 +213,10 @@ export class CircuitSimulation {
     }
 
     // Get array of inputs, sorted by name
-    const inputs = Object.keys(nodeSolution.inputs).sort();
+    const inputs = Object.keys(elementDefinitions[node.type].inputs).sort();
     // Get array of input values
-    const inputValues = inputs.map(
-      (input) => (nodeSolution.inputs ? nodeSolution.inputs[input] : false) // Should never be false, thanks TypeScript
+    const inputValues = inputs.map((input) =>
+      nodeSolution.inputs ? nodeSolution.inputs[input] ?? false : false
     );
     // Convert input values to a string of 1s and 0s
     const inputValuesString = inputValues.map((v) => (v ? '1' : '0')).join('');

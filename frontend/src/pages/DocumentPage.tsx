@@ -1,19 +1,16 @@
 import {
-  CircuitElement,
   ClientMessage,
-  ConnectMessage,
-  CreateData,
-  ServerResponse,
+  ClientMessageCreateData,
+  ClientMessageUpdateData,
   ServerUpdateMessage,
-  UpdateData,
 } from '../types';
-import { isServerResponse, isServerUpdateMessage } from '../typeGuards';
+import { isServerUpdateMessage } from '../typeGuards';
 import { useEffect, useState } from 'react';
 
 import CircuitCanvas from '../components/circuit-canvas/CircuitCanvas';
 import { CircuitSimulation } from '../circuit/circuitSimulation';
 import { JsonValue } from 'react-use-websocket/dist/lib/types';
-import { PartsMenu } from '../components/menu/PartsMenu';
+import PartsMenu from '../components/menu/PartsMenu';
 import { ToolsMenu } from '../components/menu/ToolsMenu';
 import { selectUser } from '../app/reducers/user';
 import { updateCircuitState } from '../utils';
@@ -21,6 +18,7 @@ import { useAppSelector } from '../app/hooks';
 import { useParams } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
+import { uuidv4 } from '@firebase/util';
 
 let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
 socketUrl = socketUrl.replace('https', 'ws');
@@ -42,58 +40,50 @@ export default function DocumentPage() {
     throw new Error('documentId is undefined');
   }
 
-  const [circuitState, setCircuitState] = useState<CircuitElement[]>([]);
-
   const onMessage = (event: MessageEvent) => {
     // Handle incoming messages here
     // Relevant types are:
     // ServerResponse (for responses to requests)
     // ServerMessageUpdate (for updates to the circuit)
-    const data: ServerResponse | ServerUpdateMessage | unknown = JSON.parse(
-      event.data
-    );
+    const data: ServerUpdateMessage = JSON.parse(event.data);
 
-    if (isServerResponse(data)) {
-      // Handle response
-      console.log('Server Response', data);
-    } else if (isServerUpdateMessage(data)) {
-      console.log('Server Update Message', data);
-      if (data.documentId !== documentId) {
-        return;
-      }
-      setCircuitState((state) => {
-        return updateCircuitState(state, data.elements);
-      });
-    } else {
+    if (!isServerUpdateMessage(data)) {
       console.warn('Message of unknown type', data);
+      return;
     }
+
+    console.log('Server Update Message', data);
+    if (data.documentId !== documentId) {
+      console.error(
+        'Server sent message for wrong document',
+        data.documentId,
+        documentId
+      );
+      return;
+    }
+
+    // TODO: Update circuit elements with those received from the server
   };
 
   const onOpen = () => {
     console.log('Connected to server');
-    const message: ConnectMessage = {
-      type: 'connect',
+    const message: ClientMessage = {
+      requestId: uuidv4(),
       documentId,
       userId,
+      type: 'connect',
+      data: {},
     };
     sendJsonMessage(message);
   };
 
-  const { sendJsonMessage } = useWebSocket(socketUrl, {
-    onOpen,
-    onMessage,
-    // Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (closeEvent) => true,
-  });
-
-  const updateElement = (element: CircuitElement, update: UpdateData) => {
+  const updateElement = (update: ClientMessageUpdateData) => {
     const requestId = uuid();
     const message: ClientMessage = {
       requestId,
       documentId,
       userId,
       type: 'update',
-      targetId: element.id,
       data: update,
     };
     sendJsonMessage(message as unknown as JsonValue); // Websocket lib doesn't like string[] for arrays
@@ -101,14 +91,14 @@ export default function DocumentPage() {
     // TODO: Handle storing request until response is received
   };
 
-  const createElement = (element: CreateData) => {
+  const createElement = (data: ClientMessageCreateData) => {
     const requestId = uuid();
     const message: ClientMessage = {
       requestId: requestId,
       documentId: documentId,
       userId: userId,
       type: 'create',
-      data: element,
+      data: data,
     };
     sendJsonMessage(message as unknown as JsonValue); // Websocket lib doesn't like string[] for arrays
 
@@ -122,12 +112,23 @@ export default function DocumentPage() {
       documentId,
       userId,
       type: 'delete',
-      targetId: elementId,
+      data: {
+        id: elementId,
+      },
     };
     sendJsonMessage(message as unknown as JsonValue); // Websocket lib doesn't like string[] for arrays
 
     // TODO: Handle storing request until response is received
   };
+
+  const { sendJsonMessage } = useWebSocket(socketUrl, {
+    onOpen,
+    onMessage,
+    // Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (closeEvent) => true,
+  });
+
+  // TODO: Write message sending
 
   const onPlayClick = () => {
     const simulation = new CircuitSimulation();
@@ -140,8 +141,11 @@ export default function DocumentPage() {
       <div className="w-screen h-screen overflow-hidden">
         <ToolsMenu documentId={documentId} onPlayClick={onPlayClick} />
         <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
-          <PartsMenu />
-          <CircuitCanvas circuitState={circuitState} />
+          <PartsMenu createCallback={createElement} />
+          <CircuitCanvas
+            updateCallBack={updateElement}
+            deleteCallBack={deleteElement}
+          />
         </div>
       </div>
     </>

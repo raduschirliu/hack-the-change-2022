@@ -1,12 +1,4 @@
-import { CircuitElement, ServerResponse, ServerUpdateMessage } from './types';
-
-export const isServerResponse = (data: any): data is ServerResponse => {
-  return (
-    typeof data === 'object' &&
-    typeof data.requestId === 'string' &&
-    typeof data.success === 'boolean'
-  );
-};
+import { CircuitElement, ServerUpdateMessage } from './types';
 
 export const isCircuitElement = (data: any): data is CircuitElement => {
   return (
@@ -22,6 +14,7 @@ export const isCircuitElement = (data: any): data is CircuitElement => {
   );
 };
 
+// TODO: This is no longer up to date with the new type
 export const isServerUpdateMessage = (
   data: any
 ): data is ServerUpdateMessage => {

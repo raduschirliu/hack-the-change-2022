@@ -8,13 +8,21 @@ import {
 } from '../../app/reducers/documentSlice';
 import CircuitEditor from '../../circuit/circuitEditor';
 
-import { CircuitElement, CircuitElementRemove, CircuitElementUpdate } from '../../types';
+import {
+  CircuitElement,
+  CircuitElementRemove,
+  CircuitElementUpdate,
+  ClientMessageUpdateData,
+} from '../../types';
 
 interface CircuitCanvasProps {
-  circuitState: CircuitElement[];
+  updateCallBack: (update: ClientMessageUpdateData) => void;
+  deleteCallBack: (eID: string) => void;
 }
 
-export default function CircuitCanvas({ circuitState }: CircuitCanvasProps) {
+const CircuitCanvas: React.FC<CircuitCanvasProps> = (
+  props: CircuitCanvasProps
+) => {
   const twoDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<CircuitEditor | null>(null);
   const activeTool = useAppSelector(selectActiveTool);
@@ -30,11 +38,13 @@ export default function CircuitCanvas({ circuitState }: CircuitCanvasProps) {
     editorRef.current.onCircuitUpdated = (update: CircuitElementUpdate) => {
       console.log('dispatched update', update);
       dispatch(updateCircuitElements([update]));
+      props.updateCallBack(update);
     };
 
     editorRef.current.onCircuitRemoved = (remove: CircuitElementRemove) => {
       console.log('dispatched remove', remove);
       dispatch(removeCircuitElements([remove]));
+      props.deleteCallBack(remove.id);
     };
   }, [twoDivRef, dispatch]);
 
@@ -54,4 +64,6 @@ export default function CircuitCanvas({ circuitState }: CircuitCanvasProps) {
   }, [editorRef, elements]);
 
   return <div className="w-full h-full" ref={twoDivRef}></div>;
-}
+};
+
+export default CircuitCanvas;

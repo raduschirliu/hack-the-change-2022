@@ -9,7 +9,8 @@ type Document struct {
 }
 
 type CreateDocumentRequest struct {
-	Name string `json:"name" binding:"required"`
+	Name string           `json:"name" binding:"required"`
+	Body []CircuitElement `json:"elements" bson:"elements"`
 }
 
 type FindDocumentRequest struct {

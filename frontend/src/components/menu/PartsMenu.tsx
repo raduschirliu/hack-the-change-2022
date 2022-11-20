@@ -3,8 +3,13 @@ import elementDefinitions from '../../circuit/circuitElementDefinitions';
 import { buildCircuitElement } from '../../circuit/circuitElement';
 import { addCircuitElement } from '../../app/reducers/documentSlice';
 import { useAppDispatch } from '../../app/hooks';
+import { ClientMessageCreateData } from '../../types';
 
-export function PartsMenu() {
+interface IPartsMenuProps {
+  createCallback: (update: ClientMessageCreateData) => void;
+}
+
+const PartsMenu: React.FC<IPartsMenuProps> = (props: IPartsMenuProps) => {
   const dispatch = useAppDispatch();
 
   const onClick = (id: string) => {
@@ -16,6 +21,7 @@ export function PartsMenu() {
     }
 
     dispatch(addCircuitElement(elem));
+    props.createCallback(elem);
   };
 
   return (
@@ -33,4 +39,6 @@ export function PartsMenu() {
       </div>
     </div>
   );
-}
+};
+
+export default PartsMenu;

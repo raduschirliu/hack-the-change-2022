@@ -6,25 +6,20 @@ export const updateCircuitState = (
   originalCircuitState: CircuitElement[],
   elementUpdates: CircuitElementUpdate[]
 ): CircuitElement[] => {
+  console.log('payload', elementUpdates);
   // A foul hack for deep copy
   let circuitState: CircuitElement[] = JSON.parse(
     JSON.stringify(originalCircuitState)
   );
 
   for (const elementUpdate of elementUpdates) {
-    const elementIndex = circuitState.findIndex(
-      (element) => element.id === elementUpdate.targetId
-    );
-    if (elementIndex === -1) {
-      console.error('Invalid update element', elementUpdate);
+    const idx = circuitState.findIndex((e) => e.id === elementUpdate.id);
+
+    if (idx === -1) {
+      // Doesnt exist
+      circuitState.push(elementUpdate);
     } else {
-      circuitState[elementIndex] = {
-        ...circuitState[elementIndex],
-        params: {
-          ...circuitState[elementIndex].params,
-          ...elementUpdate.params,
-        },
-      };
+      circuitState[idx] = elementUpdate;
     }
   }
   return circuitState;
