@@ -43,6 +43,13 @@ export type CircuitElementIoPortTuple = {
   ioPort: CircuitElementIO;
 };
 
+export function getWireId(
+  src: CircuitElementIoPortTuple,
+  sink: CircuitElementIoPortTuple
+): string {
+  return `${src.element.id}/${src.ioPort.id} -> ${sink.element.id}/${sink.ioPort.id}`;
+}
+
 export function buildWireConnection(
   src: CircuitElementIoPortTuple,
   sink: CircuitElementIoPortTuple
@@ -57,6 +64,8 @@ export function buildWireConnection(
     console.error('Failed to create wire for connection', src, sink);
     return null;
   }
+
+  wire.id = getWireId(src, sink);
 
   wire.params.inputs[WIRE_INPUT_ID] = {
     elementId: src.element.id,

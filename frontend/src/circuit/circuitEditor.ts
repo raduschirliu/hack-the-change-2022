@@ -15,12 +15,16 @@ import { ZUI } from 'two.js/extras/jsm/zui';
 import elementDefinitions, {
   WIRE_INPUT_ID,
   WIRE_OUTPUT_ID,
+  WIRE_TYPE_ID,
 } from './circuitElementDefinitions';
 import { Shape } from 'two.js/src/shape';
 import {
   buildWireConnection,
   CircuitElementIoPortTuple,
+  getWireId,
 } from './circuitElement';
+import { Path } from 'two.js/src/path';
+import { Anchor } from 'two.js/src/anchor';
 
 export enum CursorMode {
   Default = 'default',
@@ -49,11 +53,9 @@ enum EditorToolState {
 
   // Connect tool selected
   Connect = 'connect',
+
   // Element being connected
   ConnectingElement = 'connectingElement',
-
-  // Currently connecting two ports
-  Connecting = 'connecting',
 
   // Erase tool selected
   Erase = 'erase',
@@ -78,6 +80,7 @@ type EditorToolData =
       state: EditorToolState.ConnectingElement;
       element: CircuitElement;
       io: CircuitElementIO;
+      wirePath: Path;
     };
 
 const IO_PORT_RADIUS = 10;
@@ -108,8 +111,13 @@ class CircuitEditor {
       [key: string]: Shape;
     };
   } = {};
+  private wirePaths: { [key: string]: Path } = {};
   private activeTool: EditorTool = EditorTool.Move;
   private toolData: EditorToolData = { state: EditorToolState.Move };
+
+  get surfaceMousePos(): Vector {
+    return this.zui.clientToSurface(this.mousePos.x, this.mousePos.y);
+  }
 
   get toolState(): EditorToolState {
     return this.toolData.state;
@@ -179,7 +187,13 @@ class CircuitEditor {
     }
 
     // Build all the element shapes
-    this.elements.forEach((element) => this.buildElement(element));
+    this.elements.forEach((element) => {
+      if (element.typeId === WIRE_TYPE_ID) {
+        this.updateWireShape(element);
+      } else {
+        this.updateElementShape(element);
+      }
+    });
   }
 
   private setState(newState: EditorToolState) {
@@ -277,13 +291,27 @@ class CircuitEditor {
       return;
     }
 
-    console.log('Start connecting', element, io);
+    const srcIoPos = new Vector(
+      element.params.x + io.xOffset,
+      element.params.y + io.yOffset
+    );
+    const wirePath = new Two.Line(
+      srcIoPos.x,
+      srcIoPos.y,
+      this.surfaceMousePos.x,
+      this.surfaceMousePos.y
+    );
+    wirePath.fill = elementDefinitions[WIRE_TYPE_ID].color;
+    this.stage.add(wirePath);
 
     this.toolData = {
       state: EditorToolState.ConnectingElement,
       element,
       io,
+      wirePath,
     };
+
+    console.log('Start connecting', element, io);
   }
 
   private buildUpdateMsg(
@@ -307,7 +335,6 @@ class CircuitEditor {
 
     if (this.toolData.io.type === io.type) {
       console.error('Cannot connect to same type of IO');
-      this.setState(EditorToolState.Connect);
       return;
     }
 
@@ -336,6 +363,14 @@ class CircuitEditor {
       src = start;
     }
 
+    // Check if wire already exists between these ports
+    const wireKey = getWireId(src, sink);
+    if (wireKey in this.wirePaths) {
+      console.error('Cannot have two identical wires');
+      this.setState(EditorToolState.Connect);
+      return;
+    }
+
     // Creating wire to connect: src.output -> wire -> sink.input
     const wire = buildWireConnection(src, sink);
 
@@ -343,6 +378,13 @@ class CircuitEditor {
       console.error('Failed to create wire');
       return;
     }
+
+    // Create wire shape and remote temp
+    this.toolData.wirePath.remove();
+    this.buildWire(wire);
+
+    // Send new wire element
+    this.onCircuitUpdated(wire);
 
     // Connect src output -> wire input
     this.onCircuitUpdated(
@@ -441,8 +483,102 @@ class CircuitEditor {
     this.domElement.style.cursor = cursor;
   }
 
+  getWireConnectionTuples(wire: CircuitElement): {
+    src: CircuitElementIoPortTuple;
+    sink: CircuitElementIoPortTuple;
+  } | null {
+    // Src / input
+    const input = wire.params.inputs[WIRE_INPUT_ID]!;
+    let srcElement = this.elements.find((e) => e.id === input.elementId);
+
+    if (!srcElement) {
+      console.error('Failed to find tuple for wire', wire);
+      return null;
+    }
+
+    let srcElementIo = elementDefinitions[srcElement.typeId].inputs.find(
+      (i) => i.id === input.ioPortId
+    );
+
+    if (!srcElementIo) {
+      console.error('Failed to find tuple for wire', wire);
+      return null;
+    }
+
+    let src: CircuitElementIoPortTuple = {
+      element: srcElement,
+      ioPort: srcElementIo,
+    };
+
+    // Sink / output
+    const output = wire.params.outputs[WIRE_OUTPUT_ID]!;
+    let sinkElement = this.elements.find((e) => e.id === output.elementId);
+
+    if (!sinkElement) {
+      console.error('Failed to find tuple for wire', wire);
+      return null;
+    }
+
+    let sinkElementIo = elementDefinitions[sinkElement.typeId].outputs.find(
+      (i) => i.id === input.ioPortId
+    );
+
+    if (!sinkElementIo) {
+      console.error('Failed to find tuple for wire', wire);
+      return null;
+    }
+
+    let sink: CircuitElementIoPortTuple = {
+      element: sinkElement,
+      ioPort: sinkElementIo,
+    };
+
+    return {
+      src,
+      sink,
+    };
+  }
+
   /**
-   * Draw a single circuit element
+   * Build the canvas shapes for a single wire circuit element
+   */
+  buildWire(wire: CircuitElement) {
+    // Check if wire already exists
+    if (!(wire.id in this.wirePaths)) {
+      const path = new Two.Line();
+      path.fill = elementDefinitions[WIRE_TYPE_ID].color;
+      this.stage.add(path);
+    }
+
+    // Update line path start/end positions
+    const tuples = this.getWireConnectionTuples(wire);
+
+    if (!tuples) {
+      console.error('Failed to build wire', wire);
+      return;
+    }
+
+    const { src, sink } = tuples;
+    const path = this.wirePaths[wire.id];
+    const startPos = new Vector(
+      src.element.params.x + src.ioPort.xOffset,
+      src.element.params.y + src.ioPort.yOffset
+    );
+    const endPos = new Vector(
+      sink.element.params.x + sink.ioPort.xOffset,
+      sink.element.params.y + sink.ioPort.yOffset
+    );
+
+    path.vertices = [
+      new Anchor(startPos.x, startPos.y),
+      new Anchor(endPos.x, endPos.y),
+    ];
+
+    console.log('built new wire shape');
+  }
+
+  /**
+   * Build the canvas shapes for a single (non-wire) circuit element
    */
   buildElement(element: CircuitElement) {
     const definition = elementDefinitions[element.typeId];
@@ -494,11 +630,42 @@ class CircuitEditor {
     this.stage.add(group);
   }
 
+  updateTempWireShape(newPos: Vector) {
+    if (this.toolData.state !== EditorToolState.ConnectingElement) {
+      console.error('Cannot update wire shape when not in connecting state');
+      return;
+    }
+
+    const surfacePos: Vector = this.zui.clientToSurface(newPos.x, newPos.y);
+    let endPoint: Anchor = this.toolData.wirePath.vertices[1];
+    endPoint.set(surfacePos.x, surfacePos.y);
+  }
+
+  updateWireShape(element: CircuitElement) {
+    if (element.typeId !== WIRE_TYPE_ID) {
+      console.error('Cannot use updateWireShape for non-wire elements');
+      return;
+    }
+
+    // TODO(radu): Update wire shape path
+  }
+
   /**
    * Update the Two.JS shape representation of an element
    * @param element The element to update
    */
   updateElementShape(element: CircuitElement) {
+    if (element.typeId === WIRE_TYPE_ID) {
+      console.error('Cannot use updateElementShape for wire elements');
+      return;
+    }
+
+    // Check if element shape needs to be created
+    if (!(element.id in this.elementShapes)) {
+      this.buildElement(element);
+    }
+
+    // Update the position for the shape
     const group = this.elementShapes[element.id].group;
     group.position.set(element.params.x, element.params.y);
 
@@ -645,7 +812,7 @@ class CircuitEditor {
       this.toolData.element.params.y += deltaPos.y;
       this.updateElementShape(this.toolData.element);
     } else if (this.toolData.state === EditorToolState.ConnectingElement) {
-      // TODO: Draw connection line
+      this.updateTempWireShape(newPos);
     }
 
     this.mousePos = newPos;
