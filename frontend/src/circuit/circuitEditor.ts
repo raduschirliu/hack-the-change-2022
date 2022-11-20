@@ -255,6 +255,8 @@ class CircuitEditor {
       state: EditorToolState.Simulate,
       solution,
     };
+
+    this.drawSolution();
   }
   private startMovingElement(element: CircuitElement) {
     if (this.toolState !== EditorToolState.Move) {
@@ -734,6 +736,55 @@ class CircuitEditor {
     group.position.set(element.params.x, element.params.y);
 
     // TODO(radu): Update location of connections
+  }
+
+  drawSolution() {
+    console.log('drawing');
+
+    if (this.toolData.state !== EditorToolState.Simulate) {
+      console.error('Cannot draw solution when not in simulate state');
+      return;
+    }
+
+    Object.entries(this.toolData.solution).forEach(
+      ([elementId, nodeSolution]) => {
+        const element = this.elements.find((e) => e.id === elementId);
+        if (!element) {
+          console.error('Failed to find element for solution', elementId);
+          return;
+        }
+
+        let shape;
+
+        switch (element.typeId) {
+          case 'Input':
+            shape = this.elementShapes[element.id];
+            shape.group.children[0].stroke =
+              nodeSolution.outputs && nodeSolution.outputs['output_0']
+                ? 'red'
+                : '';
+            break;
+
+          case 'Output':
+            shape = this.elementShapes[element.id];
+            shape.group.children[0].stroke =
+              nodeSolution.inputs && nodeSolution.inputs['input_0']
+                ? 'red'
+                : '';
+            break;
+
+          case 'Wire':
+            this.wirePaths[element.id].stroke =
+              nodeSolution.inputs && nodeSolution.inputs['input']
+                ? 'red'
+                : 'black';
+            break;
+
+          default:
+            break;
+        }
+      }
+    );
   }
 
   /**

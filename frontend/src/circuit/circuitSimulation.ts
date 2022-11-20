@@ -34,6 +34,8 @@ export class CircuitSimulation {
   solution: Solution = {};
 
   constructor(elements: CircuitElement[]) {
+    elements = JSON.parse(JSON.stringify(elements));
+
     // Create a map of element IDs to nodes
     const nodes: Record<string, Node> = {};
     for (const element of elements) {
