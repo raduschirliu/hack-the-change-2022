@@ -1,20 +1,5 @@
-import { CircuitDocument } from '../types';
-import { Link } from 'react-router-dom';
-import useAxios from 'axios-hooks';
-import { useCallback, useState } from 'react';
-import { JoinNav } from '../components/join/JoinNav';
-import { CircuitList } from '../components/join/CircuitList';
-import { useAppDispatch } from '../app/hooks';
-import { clearUser } from '../app/reducers/user';
 import { LandNav } from '../components/landing/LandNav';
 import circuitPic from '../res/circuit.png';
-
-const getDocumentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
-
-{
-  /* <Link to={'/sign-up'}>Sign Up</Link>
-<Link to={'/sign-in'}>Sign In</Link> */
-}
 
 export default function Landing() {
   return (

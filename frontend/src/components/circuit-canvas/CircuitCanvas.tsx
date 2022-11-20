@@ -46,6 +46,7 @@ const CircuitCanvas: React.FC<CircuitCanvasProps> = (
       dispatch(removeCircuitElements([remove]));
       props.deleteCallBack(remove.id);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [twoDivRef, dispatch]);
 
   // Send active tool to the editor
