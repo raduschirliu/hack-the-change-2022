@@ -110,7 +110,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Output',
     label: 'Output',
-    color: '#fde047',
+    color: '#f472b6',
     width: 50,
     height: 50,
     inputs: [
