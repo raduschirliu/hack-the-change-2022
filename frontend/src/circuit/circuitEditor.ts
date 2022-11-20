@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {
   CircuitElement,
   CircuitElementIO,
@@ -93,6 +95,7 @@ const MOUSE_RIGHT_BUTTON = 2;
 
 class CircuitEditor {
   /* Callbacks */
+  // @
   public onCircuitUpdated: (update: CircuitElementUpdate) => void = (
     update
   ) => {};
