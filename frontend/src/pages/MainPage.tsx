@@ -2,12 +2,20 @@ import { CircuitDocument } from '../types';
 import { Link } from 'react-router-dom';
 import useAxios from 'axios-hooks';
 import { useState } from 'react';
+import { useAppDispatch } from '../app/hooks';
+import { clearUser } from '../app/reducers/user';
 
 const documentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
 
 export default function RootPage() {
+  const dispatch = useAppDispatch();
   const [{ data, loading, error }] = useAxios<CircuitDocument[]>(documentsUrl);
   const [userId, setUserId] = useState('');
+
+  const onLogoutPress = () => {
+    console.log('Logout req');
+    dispatch(clearUser());
+  };
 
   return (
     <div>
@@ -37,6 +45,7 @@ export default function RootPage() {
           ))
         )}
       </div>
+      <button onClick={onLogoutPress}>Log Out</button>
     </div>
   );
 }

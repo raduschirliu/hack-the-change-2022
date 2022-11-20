@@ -16,10 +16,11 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import SignUp from './pages/SignUp';
 import firebaseConfig from './firebaseConfig';
+import ProtectedPage from './components/ProtectedPage';
+import SignIn from './pages/SignIn';
+import Landing from './pages/Landing';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-
-const app = initializeApp(firebaseConfig);
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -27,19 +28,31 @@ const root = createRoot(container);
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootPage />,
-  },
-  {
-    path: '/document/:documentId',
-    element: (
-      <>
-        <DocumentPage />
-      </>
-    ),
+    element: <Landing />,
   },
   {
     path: '/sign-up',
     element: <SignUp />,
+  },
+  {
+    path: '/sign-in',
+    element: <SignIn />,
+  },
+  {
+    path: '/home',
+    element: (
+      <ProtectedPage>
+        <RootPage />
+      </ProtectedPage>
+    ),
+  },
+  {
+    path: '/document/:documentId',
+    element: (
+      <ProtectedPage>
+        <DocumentPage />
+      </ProtectedPage>
+    ),
   },
 ]);
 

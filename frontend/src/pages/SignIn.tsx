@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { getAuth, createUserWithEmailAndPassword, Auth } from 'firebase/auth';
+import { getAuth, Auth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectFirebase, setFirebase } from '../app/reducers/firebase';
 import { setUser } from '../app/reducers/user';
@@ -8,7 +8,7 @@ import { FirebaseError, initializeApp } from 'firebase/app';
 import firebaseConfig from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 
-const SignUp: React.FC = () => {
+const SignIn: React.FC = () => {
   const app = useAppSelector(selectFirebase);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const SignUp: React.FC = () => {
   const onSubmitPress = async () => {
     if (!auth) return;
     try {
-      const userCredential = await createUserWithEmailAndPassword(
+      const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password
@@ -65,4 +65,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+export default SignIn;
