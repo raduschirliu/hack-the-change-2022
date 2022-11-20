@@ -1,4 +1,5 @@
 import {
+  CircuitElement,
   ClientMessage,
   ClientMessageCreateData,
   ClientMessageUpdateData,
@@ -14,18 +15,22 @@ import { ToolsMenu } from '../components/menu/ToolsMenu';
 import { isServerUpdateMessage } from '../typeGuards';
 import { selectUser } from '../app/reducers/user';
 import { updateCircuitState } from '../utils';
-import { useAppSelector } from '../app/hooks';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { useParams } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
 import { uuidv4 } from '@firebase/util';
+import axios from 'axios';
+import { addCircuitElement } from '../app/reducers/documentSlice';
 
 let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
 socketUrl = socketUrl.replace('https', 'ws');
 socketUrl = socketUrl.replace('http', 'ws');
+const documentUrl = `${process.env['REACT_APP_API_URL']}/api/document`;
 
 export default function DocumentPage() {
   const { documentId } = useParams();
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const [userId, setUserId] = useState('');
 
@@ -74,7 +79,21 @@ export default function DocumentPage() {
       type: 'connect',
       data: {},
     };
-    sendJsonMessage(message);
+
+    (async () => {
+      const res = await axios.get(documentUrl, {
+        params: {
+          uuid: documentId,
+        },
+      });
+      // console.warn('Got doc res', res);
+      console.log((res.data as any).document.elements);
+      const thing: CircuitElement[] = (res.data as any).document.elements;
+      thing.forEach((x) => {
+        dispatch(addCircuitElement(x));
+      });
+    })();
+    // sendJsonMessage(message);
   };
 
   const updateElement = (update: ClientMessageUpdateData) => {
@@ -86,6 +105,7 @@ export default function DocumentPage() {
       type: 'update',
       data: update,
     };
+    console.warn('YEYEYEYEYYEYE', message);
     sendJsonMessage(message as unknown as JsonValue); // Websocket lib doesn't like string[] for arrays
 
     // TODO: Handle storing request until response is received

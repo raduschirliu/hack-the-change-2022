@@ -11,9 +11,9 @@ type UpdateData struct {
 func (data UpdateData) ToElement() CircuitElement {
 	var elem CircuitElement
 	elem.Id = data.Id
-	elem.X = data.X
-	elem.Y = data.Y
-	elem.Inputs = data.Input
-	elem.Outputs = data.Outputs
+	elem.Data.X = data.X
+	elem.Data.Y = data.Y
+	elem.Data.Inputs = data.Input
+	elem.Data.Outputs = data.Outputs
 	return elem
 }
