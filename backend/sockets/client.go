@@ -27,15 +27,28 @@ func (c *Client) Read() {
 			log.Println(err)
 			return
 		}
-		log.Println(msg)
+
+		c.handleMessage(msg)
 
 		users := c.Pool.GetUsers()
 
 		res := models.ServerUpdateMessage{
 			DocumentId: msg.DocumentId,
-			Elements:   []models.CircuitElementUpdate{},
+			Elements:   []models.CircuitElement{},
 			Users:      users,
 		}
 		c.Conn.WriteJSON(res)
+	}
+}
+
+func (c *Client) handleMessage(msg models.ClientMessage) {
+	switch msg.Type {
+	case "update":
+
+		break
+	case "delete":
+		break
+	case "create":
+
 	}
 }
