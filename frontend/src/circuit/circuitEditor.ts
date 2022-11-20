@@ -370,11 +370,11 @@ class CircuitEditor {
         }
         break;
 
-      case EditorToolState.ConnectingElement:
       case EditorToolState.MovingElement:
         cursor = CursorMode.Grabbing;
         break;
 
+      case EditorToolState.ConnectingElement:
       case EditorToolState.Connect:
         const ioTarget = this.getIoPortAtMouse();
         if (ioTarget) {
