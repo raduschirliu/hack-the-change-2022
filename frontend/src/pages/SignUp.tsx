@@ -1,6 +1,12 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { getAuth, createUserWithEmailAndPassword, Auth } from 'firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  Auth,
+  browserSessionPersistence,
+  setPersistence,
+} from 'firebase/auth';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectFirebase, setFirebase } from '../app/reducers/firebase';
 import { setUser } from '../app/reducers/user';
@@ -31,12 +37,13 @@ const SignUp: React.FC = () => {
   const onSubmitPress = async () => {
     if (!auth) return;
     try {
+      await setPersistence(auth, browserSessionPersistence);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      dispatch(setUser(userCredential));
+      dispatch(setUser(userCredential.user));
       console.warn('Got user', userCredential);
       navigate('/home');
     } catch (e) {
