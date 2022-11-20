@@ -91,3 +91,7 @@ export type CircuitDocument = {
   uuid: string;
   name: string;
 };
+
+export type CreateCircuitDocument = {
+  name: string;
+};

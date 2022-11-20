@@ -1,6 +1,7 @@
-import { CircuitDocument } from '../types';
-import { Link } from 'react-router-dom';
+import { CircuitDocument, CreateCircuitDocument } from '../types';
+import { Link, useNavigate } from 'react-router-dom';
 import useAxios from 'axios-hooks';
+import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { JoinNav } from '../components/join/JoinNav';
 import { CircuitList } from '../components/join/CircuitList';
@@ -8,11 +9,27 @@ import { useAppDispatch } from '../app/hooks';
 import { clearUser } from '../app/reducers/user';
 
 const getDocumentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
+const documentUrl = `${process.env['REACT_APP_API_URL']}/api/document`;
 
 export default function JoinPage() {
   const [
     { data: documents, loading: documentsLoading, error: documentsError },
   ] = useAxios<CircuitDocument[]>(getDocumentsUrl);
+  const navigate = useNavigate();
+
+  const onCreateDocumentButtonPress = async () => {
+    let c: CreateCircuitDocument = {
+      name: circuitName,
+    };
+    const res = await axios.post(documentUrl, c);
+    console.log('Got res', res);
+    if (res.status === 200) {
+      const uuid: string = res.data.uuid;
+      navigate(`/document/${uuid}`);
+    } else {
+      console.error('Failed creating document', res);
+    }
+  };
 
   const [circuitName, setCircuitName] = useState('');
 
@@ -56,9 +73,7 @@ export default function JoinPage() {
               <button
                 type="button"
                 className="block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-                onClick={() => {
-                  // TODO: make axios request to make document
-                }}
+                onClick={onCreateDocumentButtonPress}
               >
                 Create
               </button>

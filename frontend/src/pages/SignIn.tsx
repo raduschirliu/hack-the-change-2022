@@ -1,6 +1,11 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { getAuth, Auth, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  getAuth,
+  Auth,
+  signInWithEmailAndPassword,
+  setPersistence,
+} from 'firebase/auth';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectFirebase, setFirebase } from '../app/reducers/firebase';
 import { setUser } from '../app/reducers/user';
