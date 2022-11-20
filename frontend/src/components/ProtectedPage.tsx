@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
-import { selectAuth } from '../app/reducers/user';
+import { selectUser } from '../app/reducers/user';
 
 interface IProtectedPageProps {
   children: JSX.Element;
@@ -10,7 +10,7 @@ interface IProtectedPageProps {
 const ProtectedPage: React.FC<IProtectedPageProps> = (
   props: IProtectedPageProps
 ) => {
-  const user = useAppSelector(selectAuth);
+  const user = useAppSelector(selectUser);
 
   return user === undefined ? <Navigate to={'/sign-in'} /> : props.children;
 };
