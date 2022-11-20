@@ -3,23 +3,29 @@ import { CircuitElement, CircuitElementUpdate } from './types';
 import { isCircuitElement } from './typeGuards';
 
 export const updateCircuitState = (
-  circuitState: CircuitElement[],
+  originalCircuitState: CircuitElement[],
   elementUpdates: CircuitElementUpdate[]
 ): CircuitElement[] => {
+  // A foul hack for deep copy
+  let circuitState: CircuitElement[] = JSON.parse(
+    JSON.stringify(originalCircuitState)
+  );
+
   for (const elementUpdate of elementUpdates) {
     const elementIndex = circuitState.findIndex(
-      (element) => element.id === elementUpdate.id
+      (element) => element.id === elementUpdate.targetId
     );
     if (elementIndex === -1) {
-      if (!isCircuitElement(elementUpdate)) {
-        throw new Error(`Invalid circuit element created: ${elementUpdate}`);
-      }
-      circuitState.push(elementUpdate);
+      console.error('Invalid update element', elementUpdate);
+    } else {
+      circuitState[elementIndex] = {
+        ...circuitState[elementIndex],
+        params: {
+          ...circuitState[elementIndex].params,
+          ...elementUpdate.params,
+        },
+      };
     }
-    circuitState[elementIndex] = {
-      ...circuitState[elementIndex],
-      ...elementUpdate,
-    };
   }
   return circuitState;
 };

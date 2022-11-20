@@ -1,9 +1,21 @@
 import { PartButton } from './PartButton';
 import elementDefinitions from '../../circuit/circuitElementDefinitions';
+import { buildCircuitElement } from '../../circuit/circuitElement';
+import { addCircuitElement } from '../../app/reducers/documentSlice';
+import { useAppDispatch } from '../../app/hooks';
 
 export function PartsMenu() {
+  const dispatch = useAppDispatch();
+
   const onClick = (id: string) => {
-    console.log(id + ' added.');
+    const elem = buildCircuitElement(id);
+
+    if (!elem) {
+      console.error('Invalid element created for type ', id);
+      return;
+    }
+
+    dispatch(addCircuitElement(elem));
   };
 
   return (
