@@ -4,16 +4,16 @@ import useAxios from 'axios-hooks';
 import { useCallback, useState } from 'react';
 import { JoinNav } from '../components/join/JoinNav';
 import { CircuitList } from '../components/join/CircuitList';
+import { useAppDispatch } from '../app/hooks';
+import { clearUser } from '../app/reducers/user';
 
 const getDocumentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
-const postDocumentUrl = `${process.env['REACT_APP_API_URL']}/api/document`;
 
 export default function JoinPage() {
   const [
     { data: documents, loading: documentsLoading, error: documentsError },
   ] = useAxios<CircuitDocument[]>(getDocumentsUrl);
 
-  const [userId, setUserId] = useState('');
   const [circuitName, setCircuitName] = useState('');
 
   return (
@@ -78,30 +78,6 @@ export default function JoinPage() {
         <p className="text-xs">Made with ❤️ by webbrothers</p>
       </div>
       {/* <!-- End jumbotron --> */}
-      {/* <h1>Circuit App</h1>
-      
-      <label>
-        User
-        <input
-          type="text"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-        />
-      </label>
-      <h3>Documents</h3>
-      <div>
-        {documentsLoading || documents === undefined ? (
-          <p>Loading...</p>
-        ) : documentsError ? (
-          <p>Error! {documentsError.message}</p>
-        ) : (
-          documents.map((doc, index) => (
-            <Link key={index} to={`/document/${doc.uuid}`}>
-              {doc.name + '\n'}
-            </Link>
-          ))
-        )}
-      </div> */}
     </div>
   );
 }

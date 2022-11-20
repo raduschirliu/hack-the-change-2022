@@ -5,9 +5,19 @@ import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_a
 import { isPropertySignature } from 'typescript';
 import logo from '../../res/logo.png';
 import { Link } from 'react-router-dom';
+import { clearUser } from '../../app/reducers/user';
+import { useAppDispatch } from '../../app/hooks';
 
 
 export function JoinNav() {
+    
+  const dispatch = useAppDispatch();
+
+    const onLogoutPress = () => {
+        console.log('Logout req');
+        dispatch(clearUser());
+      };
+
   return (
     <nav
       className="
@@ -41,6 +51,7 @@ export function JoinNav() {
             data-mdb-ripple-color="light"
             className="px-5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
             title="Logout"
+            onClick={onLogoutPress}
           >
             Logout
           </button>

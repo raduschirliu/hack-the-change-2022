@@ -11,13 +11,15 @@ import { isServerResponse, isServerUpdateMessage } from '../typeGuards';
 
 import CircuitCanvas from '../components/circuit-canvas/CircuitCanvas';
 import { JsonValue } from 'react-use-websocket/dist/lib/types';
-import { updateCircuitState } from '../utils';
-import { useParams } from 'react-router-dom';
-import { useState } from 'react';
-import useWebSocket from 'react-use-websocket';
-import { v4 as uuid } from 'uuid';
 import { PartsMenu } from '../components/menu/PartsMenu';
 import { ToolsMenu } from '../components/menu/ToolsMenu';
+import { updateCircuitState } from '../utils';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import useWebSocket from 'react-use-websocket';
+import { v4 as uuid } from 'uuid';
+import { selectUser } from '../app/reducers/user';
+import { useAppSelector } from '../app/hooks';
 
 let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
 socketUrl = socketUrl.replace('https', 'ws');
@@ -25,6 +27,15 @@ socketUrl = socketUrl.replace('http', 'ws');
 
 export default function DocumentPage() {
   const { documentId } = useParams();
+  const user = useAppSelector(selectUser);
+  const [userId, setUserId] = useState('');
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      setUserId(await (await user.user.getIdToken()).substring(0, 10));
+    })();
+  }, [user]);
 
   if (documentId === undefined) {
     throw new Error('documentId is undefined');
@@ -60,7 +71,7 @@ export default function DocumentPage() {
     const message: ConnectMessage = {
       type: 'connect',
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId,
     };
     sendJsonMessage(message);
   };
@@ -77,7 +88,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId,
       type: 'update',
       targetId: element.id,
       data: update,
@@ -92,7 +103,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId,
       type: 'create',
       data: element,
     };
@@ -106,7 +117,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId,
       type: 'delete',
       targetId: elementId,
     };
@@ -117,7 +128,7 @@ export default function DocumentPage() {
 
   return (
     <div className="w-screen h-screen overflow-hidden">
-      <ToolsMenu documentId={documentId}/>
+      <ToolsMenu documentId={documentId} />
       <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
         <PartsMenu />
         <CircuitCanvas circuitState={circuitState} />

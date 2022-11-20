@@ -1,16 +1,23 @@
-import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
-import { ReactComponent as Wire } from '@material-design-icons/svg/filled/edit.svg';
 import { ReactComponent as Delete } from '@material-design-icons/svg/filled/delete.svg';
-import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
-import { isPropertySignature } from 'typescript';
-import logo from '../../res/logo.png';
+import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
 import { Link } from 'react-router-dom';
+import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
+import { ReactComponent as Wire } from '@material-design-icons/svg/filled/edit.svg';
+import logo from '../../res/logo.png';
+import { useAppDispatch } from '../../app/hooks';
+import { clearUser } from '../../app/reducers/user';
 
 interface IProps {
   documentId: string;
 }
 
 export function ToolsMenu({ documentId }: IProps) {
+  const dispatch = useAppDispatch();
+
+  const onLogoutPress = () => {
+    dispatch(clearUser());
+  };
+
   return (
     <nav
       className="
@@ -82,6 +89,7 @@ export function ToolsMenu({ documentId }: IProps) {
             data-mdb-ripple-color="light"
             className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
             title="Logout"
+            onClick={onLogoutPress}
           >
             Logout
           </button>
