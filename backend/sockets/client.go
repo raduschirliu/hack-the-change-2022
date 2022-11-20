@@ -8,7 +8,6 @@ import (
 	"github.com/raduschirliu/hack-the-change-2022/database"
 	"github.com/raduschirliu/hack-the-change-2022/models"
 	"go.mongodb.org/mongo-driver/mongo"
-	"google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 )
 
 type Client struct {
@@ -58,12 +57,14 @@ func (c *Client) handleMessage(msg models.ClientMessage) {
 	switch msg.Type {
 	case "update":
 		if document.CheckCircuitElement(msg.TargetId) {
-			// TODO: handle update circuit element
+			element := msg.Data.ToElement()
+			docs.UpdateElement(element, document)
 		}
 		break
 	case "delete":
 		if document.CheckCircuitElement(msg.TargetId) {
-			// TODO: create circuit element
+			element := msg.Data.ToElement()
+			docs.DeleteElement(element, document)
 		}
 		break
 	case "create":

@@ -39,3 +39,46 @@ func (d DocumentCollection) CreateElement(element models.CircuitElement, documen
 		"elements": updated_elements,
 	})
 }
+
+func (d DocumentCollection) DeleteElement(element models.CircuitElement, document models.Document) {
+	indexToDelete := -1
+	for i, v := range document.Body {
+		if v.Id == element.Id {
+			indexToDelete = i
+		}
+	}
+
+	if indexToDelete == -1 {
+		// Element doesn't exist in db
+		return
+	}
+
+	updated_elements := document.Body
+	updated_elements[indexToDelete] = updated_elements[len(updated_elements)-1]
+	updated_elements = updated_elements[:len(updated_elements)-1]
+
+	d.D.UpdateByID(context.TODO(), document.DocumentId, bson.M{
+		"elements": updated_elements,
+	})
+}
+
+func (d DocumentCollection) UpdateElement(element models.CircuitElement, document models.Document) {
+	indexToUpdate := -1
+	for i, v := range document.Body {
+		if v.Id == element.Id {
+			indexToUpdate = i
+		}
+	}
+
+	if indexToUpdate == -1 {
+		// Element doesn't exist in db
+		return
+	}
+
+	updated_elements := document.Body
+	updated_elements[indexToUpdate] = element
+
+	d.D.UpdateByID(context.TODO(), document.DocumentId, bson.M{
+		"elements": updated_elements,
+	})
+}
