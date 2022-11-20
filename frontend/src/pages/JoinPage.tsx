@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 const documentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
 
-export default function RootPage() {
+export default function JoinPage() {
   const [{ data, loading, error }] = useAxios<CircuitDocument[]>(documentsUrl);
   const [userId, setUserId] = useState('');
 

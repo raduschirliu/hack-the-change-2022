@@ -6,7 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import DocumentPage from './pages/DocumentPage';
 import { Provider } from 'react-redux';
 import React from 'react';
-import RootPage from './pages/MainPage';
+import JoinPage from './pages/JoinPage';
 import { createRoot } from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import { store } from './app/store';
@@ -17,7 +17,7 @@ const root = createRoot(container);
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootPage />,
+    element: <JoinPage />,
   },
   {
     path: '/document/:documentId',
