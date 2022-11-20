@@ -36,7 +36,7 @@ export function ToolsMenu({ documentId }: IProps) {
         gap-x-4
       "
     >
-      <Link to="/">
+      <Link to="/home">
         <img
           src={logo}
           alt="our logo :)"
@@ -81,19 +81,16 @@ export function ToolsMenu({ documentId }: IProps) {
         <Play className="fill-white" />
       </button>
       <div className="ml-auto mr-4 flex-col space-y-1">
-        <p>Document ID: {documentId}</p>
-        <div className="flex justify-end">
-          <button
-            type="button"
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
-            title="Logout"
-            onClick={onLogoutPress}
-          >
-            Logout
-          </button>
-        </div>
+        <button
+          type="button"
+          data-mdb-ripple="true"
+          data-mdb-ripple-color="light"
+          className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
+          title="Logout"
+          onClick={onLogoutPress}
+        >
+          Logout
+        </button>
       </div>
     </nav>
   );

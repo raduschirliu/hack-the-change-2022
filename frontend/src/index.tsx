@@ -6,7 +6,6 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import DocumentPage from './pages/DocumentPage';
 import { Provider } from 'react-redux';
 import React from 'react';
-import JoinPage from './pages/JoinPage';
 import { createRoot } from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import { store } from './app/store';
@@ -19,6 +18,7 @@ import firebaseConfig from './firebaseConfig';
 import ProtectedPage from './components/ProtectedPage';
 import SignIn from './pages/SignIn';
 import Landing from './pages/Landing';
+import JoinPage from './pages/JoinPage';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -28,9 +28,6 @@ const root = createRoot(container);
 const router = createBrowserRouter([
   {
     path: '/',
-<<<<<<< HEAD
-    element: <JoinPage />,
-=======
     element: <Landing />,
   },
   {
@@ -45,10 +42,9 @@ const router = createBrowserRouter([
     path: '/home',
     element: (
       <ProtectedPage>
-        <RootPage />
+        <JoinPage />
       </ProtectedPage>
     ),
->>>>>>> main
   },
   {
     path: '/document/:documentId',
