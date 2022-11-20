@@ -5,6 +5,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type Document struct {
 	DocumentId primitive.ObjectID `json:"uuid" bson:"_id"`
 	Name       string             `json:"name" bson:"name"`
+	Body       []CircuitElement   `json:"elements" bson:"elements"`
 }
 
 type CreateDocumentRequest struct {

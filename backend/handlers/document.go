@@ -25,7 +25,7 @@ func (h Handler) CreateDocument(c *gin.Context) {
 
 	coll := database.DocumentsCollection(*h.D)
 
-	res, err := coll.InsertOne(c.Request.Context(), query)
+	res, err := coll.D.InsertOne(c.Request.Context(), query)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -46,7 +46,7 @@ func (h Handler) CreateDocument(c *gin.Context) {
 func (h Handler) GetDocumentList(c *gin.Context) {
 	documents := make([]models.Document, 0)
 	coll := database.DocumentsCollection(*h.D)
-	cur, err := coll.Find(c.Request.Context(), bson.M{})
+	cur, err := coll.D.Find(c.Request.Context(), bson.M{})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -95,7 +95,7 @@ func (h Handler) GetDocument(c *gin.Context) {
 	}
 
 	coll := database.DocumentsCollection(*h.D)
-	res := coll.FindOne(c.Request.Context(), bson.M{
+	res := coll.D.FindOne(c.Request.Context(), bson.M{
 		"_id": get_id,
 	})
 
@@ -133,7 +133,7 @@ func (h Handler) DeleteDocument(c *gin.Context) {
 	}
 
 	coll := database.DocumentsCollection(*h.D)
-	res, err := coll.DeleteOne(c.Request.Context(), bson.M{
+	res, err := coll.D.DeleteOne(c.Request.Context(), bson.M{
 		"_id": remove_id,
 	})
 

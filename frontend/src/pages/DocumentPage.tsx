@@ -11,17 +11,19 @@ import { isServerResponse, isServerUpdateMessage } from '../typeGuards';
 
 import CircuitCanvas from '../components/circuit-canvas/CircuitCanvas';
 import { JsonValue } from 'react-use-websocket/dist/lib/types';
+import { PartsMenu } from '../components/menu/PartsMenu';
+import { ToolsMenu } from '../components/menu/ToolsMenu';
 import { updateCircuitState } from '../utils';
 import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
-import { PartsMenu } from '../components/menu/PartsMenu';
-import { ToolsMenu } from '../components/menu/ToolsMenu';
 
 let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
 socketUrl = socketUrl.replace('https', 'ws');
 socketUrl = socketUrl.replace('http', 'ws');
+
+const userId = uuid();
 
 export default function DocumentPage() {
   const { documentId } = useParams();
@@ -60,7 +62,7 @@ export default function DocumentPage() {
     const message: ConnectMessage = {
       type: 'connect',
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
     };
     sendJsonMessage(message);
   };
@@ -77,7 +79,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
       type: 'update',
       targetId: element.id,
       data: update,
@@ -92,7 +94,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
       type: 'create',
       data: element,
     };
@@ -106,7 +108,7 @@ export default function DocumentPage() {
     const message: ClientMessage = {
       requestId,
       documentId,
-      userId: 'webbrothers', // TODO: Replace with actual user id from store
+      userId, // TODO: Replace with actual user id from store
       type: 'delete',
       targetId: elementId,
     };
@@ -117,7 +119,7 @@ export default function DocumentPage() {
 
   return (
     <div className="w-screen h-screen overflow-hidden">
-      <ToolsMenu documentId={documentId}/>
+      <ToolsMenu documentId={documentId} />
       <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
         <PartsMenu />
         <CircuitCanvas circuitState={circuitState} />

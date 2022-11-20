@@ -1,10 +1,9 @@
-import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
-import { ReactComponent as Wire } from '@material-design-icons/svg/filled/edit.svg';
 import { ReactComponent as Delete } from '@material-design-icons/svg/filled/delete.svg';
-import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
-import { isPropertySignature } from 'typescript';
-import logo from '../../res/logo.png';
+import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
 import { Link } from 'react-router-dom';
+import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
+import { ReactComponent as Wire } from '@material-design-icons/svg/filled/edit.svg';
+import logo from '../../res/logo.png';
 
 interface IProps {
   documentId: string;

@@ -9,6 +9,7 @@ import (
 	"github.com/raduschirliu/hack-the-change-2022/database"
 	"github.com/raduschirliu/hack-the-change-2022/handlers"
 	"github.com/raduschirliu/hack-the-change-2022/routes"
+	"github.com/raduschirliu/hack-the-change-2022/sockets"
 	"github.com/spf13/viper"
 )
 
@@ -39,6 +40,9 @@ func main() {
 			"hello": "world",
 		})
 	})
+
+	// init server manager to handle sockets
+	handlers.Documents = map[string]sockets.DocumentServer{}
 
 	h := &handlers.Handler{
 		D: db,
