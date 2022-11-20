@@ -4,17 +4,21 @@ const defaultDefinition: Partial<CircuitElementDefinition> = {
   visibleInToolbox: false,
 };
 
+export const WIRE_TYPE_ID = 'Wire';
+export const WIRE_INPUT_ID = 'input';
+export const WIRE_OUTPUT_ID = 'output';
+
 const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
-  Wire: {
+  [WIRE_TYPE_ID]: {
     ...defaultDefinition,
-    typeId: 'Wire',
+    typeId: WIRE_TYPE_ID,
     label: 'Wire',
     color: 'black',
-    width: 1,
-    height: 1,
+    width: 0,
+    height: 0,
     inputs: [
       {
-        id: 'input',
+        id: WIRE_INPUT_ID,
         type: 'input',
         xOffset: 0,
         yOffset: 0,
@@ -22,7 +26,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     ],
     outputs: [
       {
-        id: 'output',
+        id: WIRE_OUTPUT_ID,
         type: 'output',
         xOffset: 0,
         yOffset: 0,

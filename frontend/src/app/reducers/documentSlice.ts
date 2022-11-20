@@ -19,65 +19,8 @@ export interface DocumentState {
 
 /* Initial state */
 const initialState: DocumentState = {
-  document: {
-    uuid: 'test',
-    name: 'Test',
-  },
-  elements: [
-    {
-      id: 'and',
-      typeId: 'And',
-      params: {
-        x: 300,
-        y: 150,
-        inputs: {
-          input_0: 'input_0',
-          input_1: 'input_1',
-        },
-        outputs: {
-          output_0: 'output_0',
-        },
-      },
-    },
-    {
-      id: 'input_0',
-      typeId: 'Input',
-      params: {
-        x: 180,
-        y: 120,
-        state: true,
-        inputs: {},
-        outputs: {
-          output_0: 'and',
-        },
-      },
-    },
-    {
-      id: 'input_1',
-      typeId: 'Input',
-      params: {
-        x: 180,
-        y: 180,
-        state: false,
-        inputs: {},
-        outputs: {
-          output_0: 'and',
-        },
-      },
-    },
-    {
-      id: 'output',
-      typeId: 'Output',
-      params: {
-        x: 450,
-        y: 150,
-        inputs: {
-          input_0: 'and',
-        },
-        outputs: {},
-      },
-    },
-  ],
+  document: null,
+  elements: [],
   activeTool: EditorTool.Move,
 };
 
@@ -99,7 +42,7 @@ export const documentSlice = createSlice({
       state: DocumentState,
       action: PayloadAction<CircuitElementRemove[]>
     ) => {
-      const idsToRemove = action.payload.map((remove) => remove.targetId);
+      const idsToRemove = action.payload.map((remove) => remove.id);
       console.log('removing ids', idsToRemove);
 
       // TODO: Send this event to the backend

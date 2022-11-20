@@ -8,13 +8,15 @@ import {
 } from '../../app/reducers/documentSlice';
 import CircuitEditor from '../../circuit/circuitEditor';
 
-import { CircuitElement, CircuitElementRemove, CircuitElementUpdate } from '../../types';
+import {
+  CircuitElement,
+  CircuitElementRemove,
+  CircuitElementUpdate,
+} from '../../types';
 
-interface CircuitCanvasProps {
-  circuitState: CircuitElement[];
-}
+interface CircuitCanvasProps {}
 
-export default function CircuitCanvas({ circuitState }: CircuitCanvasProps) {
+export default function CircuitCanvas() {
   const twoDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<CircuitEditor | null>(null);
   const activeTool = useAppSelector(selectActiveTool);

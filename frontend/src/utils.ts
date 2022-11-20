@@ -13,7 +13,7 @@ export const updateCircuitState = (
 
   for (const elementUpdate of elementUpdates) {
     const elementIndex = circuitState.findIndex(
-      (element) => element.id === elementUpdate.targetId
+      (element) => element.id === elementUpdate.id
     );
     if (elementIndex === -1) {
       console.error('Invalid update element', elementUpdate);

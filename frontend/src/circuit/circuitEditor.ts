@@ -3,14 +3,24 @@ import {
   CircuitElementIO,
   CircuitElementRemove,
   CircuitElementUpdate,
+  CircuitElementIOMap,
+  RecursivePartial,
 } from '../types';
 
+import { merge } from 'lodash';
 import { Group } from 'two.js/src/group';
 import Two from 'two.js';
 import { Vector } from 'two.js/src/vector';
 import { ZUI } from 'two.js/extras/jsm/zui';
-import elementDefinitions from './circuitElementDefinitions';
+import elementDefinitions, {
+  WIRE_INPUT_ID,
+  WIRE_OUTPUT_ID,
+} from './circuitElementDefinitions';
 import { Shape } from 'two.js/src/shape';
+import {
+  buildWireConnection,
+  CircuitElementIoPortTuple,
+} from './circuitElement';
 
 export enum CursorMode {
   Default = 'default',
@@ -220,13 +230,14 @@ class CircuitEditor {
       return;
     }
 
-    this.onCircuitUpdated({
-      targetId: this.toolData.element.id,
-      params: {
-        x: this.toolData.element.params.x,
-        y: this.toolData.element.params.y,
-      },
-    });
+    this.onCircuitUpdated(
+      this.buildUpdateMsg(this.toolData.element, {
+        params: {
+          x: this.toolData.element.params.x,
+          y: this.toolData.element.params.y,
+        },
+      })
+    );
 
     this.updateElementShape(this.toolData.element);
     console.log('Stopped moving element, submitted data');
@@ -275,6 +286,13 @@ class CircuitEditor {
     };
   }
 
+  private buildUpdateMsg(
+    element: CircuitElement,
+    changes: RecursivePartial<CircuitElement>
+  ): CircuitElementUpdate {
+    return merge(element, changes);
+  }
+
   private stopConnectingElement(element: CircuitElement, io: CircuitElementIO) {
     if (this.toolData.state !== EditorToolState.ConnectingElement) {
       console.error('Cannot stop connecting if not currently connecting');
@@ -283,51 +301,79 @@ class CircuitEditor {
 
     if (this.toolData.element.id === element.id) {
       console.error('Cannot connect to self');
+      this.setState(EditorToolState.Connect);
       return;
     }
 
     if (this.toolData.io.type === io.type) {
       console.error('Cannot connect to same type of IO');
+      this.setState(EditorToolState.Connect);
       return;
     }
 
-    // Create a connection between the two elements
-    this.onCircuitUpdated({
-      targetId: this.toolData.element.id,
-      params:
-        this.toolData.io.type === 'input'
-          ? {
-              inputs: {
-                [this.toolData.io.id]: element.id,
-              },
-            }
-          : {
-              outputs: {
-                [this.toolData.io.id]: element.id,
-              },
+    // Start element/IO port
+    const start: CircuitElementIoPortTuple = {
+      element: this.toolData.element,
+      ioPort: this.toolData.io,
+    };
+
+    // End element/IO port
+    const end: CircuitElementIoPortTuple = {
+      element,
+      ioPort: io,
+    };
+
+    // Source element (the one which is providing the signal to its output)
+    let src;
+    // Sink element (the one receiving the signal to its input)
+    let sink;
+
+    if (start.ioPort.type === 'input') {
+      sink = start;
+      src = end;
+    } else {
+      sink = end;
+      src = start;
+    }
+
+    // Creating wire to connect: src.output -> wire -> sink.input
+    const wire = buildWireConnection(src, sink);
+
+    if (!wire) {
+      console.error('Failed to create wire');
+      return;
+    }
+
+    // Connect src output -> wire input
+    this.onCircuitUpdated(
+      this.buildUpdateMsg(src.element, {
+        params: {
+          outputs: {
+            [src.ioPort.id]: {
+              elementId: wire.id,
+              ioPortId: WIRE_INPUT_ID,
             },
-    });
-    this.onCircuitUpdated({
-      targetId: element.id,
-      params:
-        this.toolData.io.type === 'input'
-          ? {
-              outputs: {
-                [io.id]: this.toolData.element.id,
-              },
-            }
-          : {
-              inputs: {
-                [io.id]: this.toolData.element.id,
-              },
+          },
+        },
+      })
+    );
+
+    // Connect sink input <- wire output
+    this.onCircuitUpdated(
+      this.buildUpdateMsg(sink.element, {
+        params: {
+          inputs: {
+            [sink.ioPort.id]: {
+              elementId: wire.id,
+              ioPortId: WIRE_OUTPUT_ID,
             },
-    });
+          },
+        },
+      })
+    );
 
     console.log('Connected elements, submitted data');
-
-    this.toolData = {
-      state: EditorToolState.Connect,
-    };
+    this.setState(EditorToolState.Connect);
   }
 
   /**
@@ -467,7 +513,7 @@ class CircuitEditor {
     if (!element) return;
 
     this.onCircuitRemoved({
-      targetId: element.id,
+      id: element.id,
     });
 
     // TODO(radu): Also remove connection lines

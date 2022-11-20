@@ -3,10 +3,14 @@ import {
   CircuitElementIO,
   CircuitElementParams,
 } from '../types';
-import elementDefinitions from './circuitElementDefinitions';
+import elementDefinitions, {
+  WIRE_INPUT_ID,
+  WIRE_OUTPUT_ID,
+  WIRE_TYPE_ID,
+} from './circuitElementDefinitions';
 import { v4 as uuidv4 } from 'uuid';
 
-function buildCircuitElement(typeId: string): CircuitElement | null {
+export function buildCircuitElement(typeId: string): CircuitElement | null {
   if (!(typeId in elementDefinitions)) {
     return null;
   }
@@ -34,31 +38,35 @@ function buildCircuitElement(typeId: string): CircuitElement | null {
   } as CircuitElement;
 }
 
-const WIRE_TYPE = 'Wire';
-const WIRE_INPUT_ID = 'input_0';
-const WIRE_OUTPUT_ID = 'output_0';
-
-type CircuitElementPortTuple = {
+export type CircuitElementIoPortTuple = {
   element: CircuitElement;
   ioPort: CircuitElementIO;
 };
 
-function buildWireConnection(
-  start: CircuitElementPortTuple,
-  end: CircuitElementPortTuple
+export function buildWireConnection(
+  src: CircuitElementIoPortTuple,
+  sink: CircuitElementIoPortTuple
 ): CircuitElement | null {
-  if (!start || !end) {
+  if (!src || !sink) {
     return null;
   }
 
-  const wire = buildCircuitElement(WIRE_TYPE);
+  const wire = buildCircuitElement(WIRE_TYPE_ID);
+
   if (!wire) {
-    console.error('Failed to create wire for connection', start, end);
+    console.error('Failed to create wire for connection', src, sink);
     return null;
   }
 
-  // wire.params.inputs[WIRE_INPUT_ID] = start.
+  wire.params.inputs[WIRE_INPUT_ID] = {
+    elementId: src.element.id,
+    ioPortId: src.ioPort.id,
+  };
+
+  wire.params.outputs[WIRE_OUTPUT_ID] = {
+    elementId: sink.element.id,
+    ioPortId: sink.ioPort.id,
+  };
+
   return wire;
 }
-
-export { buildCircuitElement };
