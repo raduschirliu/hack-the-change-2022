@@ -1,22 +1,18 @@
 import {
   CircuitElement,
   CircuitElementIO,
+  CircuitElementIOMap,
   CircuitElementRemove,
   CircuitElementUpdate,
-  CircuitElementIOMap,
   RecursivePartial,
 } from '../types';
-
-import { merge } from 'lodash';
-import { Group } from 'two.js/src/group';
-import Two from 'two.js';
-import { Vector } from 'two.js/src/vector';
-import { ZUI } from 'two.js/extras/jsm/zui';
 import elementDefinitions, {
   WIRE_INPUT_ID,
   WIRE_OUTPUT_ID,
   WIRE_TYPE_ID,
 } from './circuitElementDefinitions';
+
+import { Group } from 'two.js/src/group';
 import { Shape } from 'two.js/src/shape';
 import {
   buildWireConnection,
@@ -27,6 +23,10 @@ import { Path } from 'two.js/src/path';
 import { Anchor } from 'two.js/src/anchor';
 import { throws } from 'assert';
 import { Line } from 'two.js/src/shapes/line';
+import Two from 'two.js';
+import { Vector } from 'two.js/src/vector';
+import { ZUI } from 'two.js/extras/jsm/zui';
+import { merge } from 'lodash';
 
 export enum CursorMode {
   Default = 'default',
@@ -614,6 +614,16 @@ class CircuitEditor {
     const rect = new Two.Rectangle(0, 0, definition.width, definition.height);
     rect.fill = definition.color;
     group.add(rect);
+
+    // Label
+    const labelText = definition.label.replace('put', '').toUpperCase();
+    const label = new Two.Text(labelText, 0, 0);
+    label.fill = '#fff';
+    label.size = 18;
+    label.family = 'monospace';
+    label.alignment = 'center';
+    label.baseline = 'middle';
+    group.add(label);
 
     // Inputs
     definition.inputs.forEach((input) => {

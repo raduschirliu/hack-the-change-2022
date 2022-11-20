@@ -46,7 +46,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     typeId: 'And',
     label: 'And',
     visibleInToolbox: true,
-    color: 'pink',
+    color: '#67e8f9',
     width: 50,
     height: 100,
     inputs: [
@@ -91,7 +91,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Input',
     label: 'Input',
-    color: 'lightblue',
+    color: '#059669',
     width: 50,
     height: 50,
     inputs: [],
@@ -110,7 +110,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Output',
     label: 'Output',
-    color: 'lightgreen',
+    color: '#f472b6',
     width: 50,
     height: 50,
     inputs: [
@@ -123,6 +123,264 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     ],
     outputs: [],
     truthTable: {},
+  },
+  Not: {
+    ...defaultDefinition,
+    visibleInToolbox: true,
+    typeId: 'Not',
+    label: 'Not',
+    color: '#6ee7b7',
+    width: 50,
+    height: 50,
+    inputs: [
+      {
+        id: 'input_0',
+        type: 'input',
+        xOffset: -25,
+        yOffset: 0,
+      },
+    ],
+    outputs: [
+      {
+        id: 'output_0',
+        type: 'output',
+        xOffset: 25,
+        yOffset: 0,
+      },
+    ],
+    truthTable: {
+      '0': {
+        output_0: true,
+      },
+      '1': {
+        output_0: false,
+      },
+    },
+  },
+  Or: {
+    ...defaultDefinition,
+    visibleInToolbox: true,
+    typeId: 'Or',
+    label: 'Or',
+    color: '#a5b4fc',
+    width: 50,
+    height: 100,
+    inputs: [
+      {
+        id: 'input_0',
+        type: 'input',
+        xOffset: -25,
+        yOffset: -25,
+      },
+      {
+        id: 'input_1',
+        type: 'input',
+        xOffset: -25,
+        yOffset: 25,
+      },
+    ],
+    outputs: [
+      {
+        id: 'output_0',
+        type: 'output',
+        xOffset: 25,
+        yOffset: 0,
+      },
+    ],
+    truthTable: {
+      '00': {
+        output_0: false,
+      },
+      '01': {
+        output_0: true,
+      },
+      '10': {
+        output_0: true,
+      },
+      '11': {
+        output_0: true,
+      },
+    },
+  },
+  Xor: {
+    ...defaultDefinition,
+    visibleInToolbox: true,
+    typeId: 'Xor',
+    label: 'Xor',
+    color: '#f0abfc',
+    width: 50,
+    height: 100,
+    inputs: [
+      {
+        id: 'input_0',
+        type: 'input',
+        xOffset: -25,
+        yOffset: -25,
+      },
+      {
+        id: 'input_1',
+        type: 'input',
+        xOffset: -25,
+        yOffset: 25,
+      },
+    ],
+    outputs: [
+      {
+        id: 'output_0',
+        type: 'output',
+        xOffset: 25,
+        yOffset: 0,
+      },
+    ],
+    truthTable: {
+      '00': {
+        output_0: false,
+      },
+      '01': {
+        output_0: true,
+      },
+      '10': {
+        output_0: true,
+      },
+      '11': {
+        output_0: false,
+      },
+    },
+  },
+  Nand: {
+    ...defaultDefinition,
+    visibleInToolbox: true,
+    typeId: 'Nand',
+    label: 'Nand',
+    color: '#0284c7',
+    width: 50,
+    height: 100,
+    inputs: [
+      {
+        id: 'input_0',
+        type: 'input',
+        xOffset: -25,
+        yOffset: -25,
+      },
+      {
+        id: 'input_1',
+        type: 'input',
+        xOffset: -25,
+        yOffset: 25,
+      },
+    ],
+    outputs: [
+      {
+        id: 'output_0',
+        type: 'output',
+        xOffset: 25,
+        yOffset: 0,
+      },
+    ],
+    truthTable: {
+      '00': {
+        output_0: true,
+      },
+      '01': {
+        output_0: true,
+      },
+      '10': {
+        output_0: true,
+      },
+      '11': {
+        output_0: false,
+      },
+    },
+  },
+  Nor: {
+    ...defaultDefinition,
+    visibleInToolbox: true,
+    typeId: 'Nor',
+    label: 'Nor',
+    color: '#4f46e5',
+    width: 50,
+    height: 100,
+    inputs: [
+      {
+        id: 'input_0',
+        type: 'input',
+        xOffset: -25,
+        yOffset: -25,
+      },
+      {
+        id: 'input_1',
+        type: 'input',
+        xOffset: -25,
+        yOffset: 25,
+      },
+    ],
+    outputs: [
+      {
+        id: 'output_0',
+        type: 'output',
+        xOffset: 25,
+        yOffset: 0,
+      },
+    ],
+    truthTable: {
+      '00': {
+        output_0: true,
+      },
+      '01': {
+        output_0: false,
+      },
+      '10': {
+        output_0: false,
+      },
+      '11': {
+        output_0: false,
+      },
+    },
+  },
+  Xnor: {
+    ...defaultDefinition,
+    visibleInToolbox: true,
+    typeId: 'Xnor',
+    label: 'Xnor',
+    color: '#9333ea',
+    width: 50,
+    height: 100,
+    inputs: [
+      {
+        id: 'input_0',
+        type: 'input',
+        xOffset: -25,
+        yOffset: -25,
+      },
+      {
+        id: 'input_1',
+        type: 'input',
+        xOffset: -25,
+        yOffset: 25,
+      },
+    ],
+    outputs: [
+      {
+        id: 'output_0',
+        type: 'output',
+        xOffset: 25,
+        yOffset: 0,
+      },
+    ],
+    truthTable: {
+      '00': {
+        output_0: true,
+      },
+      '01': {
+        output_0: false,
+      },
+      '10': {
+        output_0: false,
+      },
+      '11': {
+        output_0: true,
+      },
+    },
   },
 };
 

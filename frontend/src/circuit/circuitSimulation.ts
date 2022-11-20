@@ -36,67 +36,69 @@ export class CircuitSimulation {
     const { document } = store.getState();
     const { elements } = document;
 
-    // // Create a map of element IDs to nodes
-    // const nodes: Record<string, Node> = {};
-    // for (const element of elements) {
-    //   nodes[element.id] = {
-    //     id: element.id,
-    //     type: element.typeId,
-    //     state: element.typeId === 'Input' ? element.params.state : undefined,
-    //     inputs: Object.fromEntries(
-    //       Object.entries(element.params.inputs).map(([inputName, inputId]) => [
-    //         inputName,
-    //         inputId ? nodes[inputId] || inputId : null,
-    //       ])
-    //     ),
-    //     outputIds: Object.fromEntries(
-    //       Object.entries(element.params.inputs).map(([inputName, inputId]) => [
-    //         inputName,
-    //         inputId,
-    //       ])
-    //     ),
-    //     truthTable: elementDefinitions[element.typeId].truthTable,
-    //   };
-    // }
-    // // Update the inputs of each node
-    // for (const [nodeId, node] of Object.entries(nodes)) {
-    //   if (node.inputs) {
-    //     for (const [inputName, inputNode] of Object.entries(node.inputs)) {
-    //       if (typeof inputNode === 'string') {
-    //         node.inputs[inputName] = nodes[inputNode];
-    //       }
-    //     }
-    //     nodes[nodeId] = node;
-    //   }
-    // }
+    // Create a map of element IDs to nodes
+    const nodes: Record<string, Node> = {};
+    for (const element of elements) {
+      nodes[element.id] = {
+        id: element.id,
+        type: element.typeId,
+        state: element.typeId === 'Input' ? element.params.state : undefined,
+        inputs: Object.fromEntries(
+          Object.entries(element.params.inputs).map(([inputName, inputEl]) => [
+            inputName,
+            inputEl !== null
+              ? nodes[inputEl.elementId] || inputEl.elementId // If the node doesn't exist yet, use the element ID so we can resolve it later
+              : null,
+          ])
+        ),
+        outputIds: Object.fromEntries(
+          Object.entries(element.params.inputs).map(([inputName, inputEl]) => [
+            inputName,
+            inputEl !== null ? inputEl.elementId : null,
+          ])
+        ),
+        truthTable: elementDefinitions[element.typeId].truthTable,
+      };
+    }
+    // Update the inputs of each node
+    for (const [nodeId, node] of Object.entries(nodes)) {
+      if (node.inputs) {
+        for (const [inputName, inputNode] of Object.entries(node.inputs)) {
+          if (typeof inputNode === 'string') {
+            node.inputs[inputName] = nodes[inputNode];
+          }
+        }
+        nodes[nodeId] = node;
+      }
+    }
 
-    // // Update the outputIds of each node
-    // for (const [nodeId, node] of Object.entries(nodes)) {
-    //   if (node.outputIds) {
-    //     for (const [inputName, elementId] of Object.entries(node.outputIds)) {
-    //       if (elementId) {
-    //         const element = elements.find((e) => e.id === elementId);
-    //         if (element) {
-    //           const outputName = Object.entries(element.params.outputs).find(
-    //             ([, outputId]) => outputId === nodeId
-    //           )?.[0];
-    //           if (outputName) {
-    //             node.outputIds[inputName] = outputName;
-    //           }
-    //         }
-    //       }
-    //     }
-    //     nodes[nodeId] = node;
-    //   }
-    // }
+    // Update the outputIds of each node
+    for (const [nodeId, node] of Object.entries(nodes)) {
+      if (node.outputIds) {
+        for (const [inputName, elementId] of Object.entries(node.outputIds)) {
+          if (elementId) {
+            const element = elements.find((e) => e.id === elementId);
+            if (element) {
+              const outputName = Object.entries(element.params.outputs).find(
+                ([, outputId]) => outputId?.elementId === nodeId
+              )?.[0];
+              if (outputName) {
+                node.outputIds[inputName] = outputName;
+              }
+            }
+          }
+        }
+        nodes[nodeId] = node;
+      }
+    }
 
-    // console.log(nodes);
-    // this.nodes = nodes;
+    console.log(nodes);
+    this.nodes = nodes;
 
-    // // Find output elements, then get corresponding nodes
-    // const outputElements = elements.filter((e) => e.typeId === 'Output');
-    // this.outputNodes = outputElements.map((e) => nodes[e.id]);
-    // console.log(this.outputNodes);
+    // Find output elements, then get corresponding nodes
+    const outputElements = elements.filter((e) => e.typeId === 'Output');
+    this.outputNodes = outputElements.map((e) => nodes[e.id]);
+    console.log(this.outputNodes);
   }
 
   solve(): Solution {
