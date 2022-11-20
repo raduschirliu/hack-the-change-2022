@@ -9,7 +9,7 @@ import {
 } from 'firebase/auth';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectFirebase, setFirebase } from '../app/reducers/firebase';
-import { setUser } from '../app/reducers/user';
+import { setAuth as setAuthRedux } from '../app/reducers/user';
 import { FirebaseError, initializeApp } from 'firebase/app';
 import firebaseConfig from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +43,7 @@ const SignUp: React.FC = () => {
         email,
         password
       );
-      dispatch(setUser(userCredential.user));
+      dispatch(setAuthRedux(auth));
       console.warn('Got user', userCredential);
       navigate('/home');
     } catch (e) {
