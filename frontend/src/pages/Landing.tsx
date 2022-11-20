@@ -21,7 +21,7 @@ export default function Landing() {
     <div className="bg-cyan-100">
       <LandNav />
       {/* <!-- Jumbotron --> */}
-      <div className="h-full p-6 shadow-lg rounded-lg bg-cyan-100 text-gray-700">
+      <div className="h-screen p-6 shadow-lg rounded-lg bg-cyan-100 text-gray-700">
         <div className="flex flex-row justify-center">
           <img src={circuitPic} alt="circuit" className="w-1/3 p-5" />
           <div className="flex flex-col justify-center max-w-md">
