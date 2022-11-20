@@ -37,8 +37,8 @@ const CircuitCanvas: React.FC<CircuitCanvasProps> = (
 
     editorRef.current.onCircuitUpdated = (update: CircuitElementUpdate) => {
       console.log('dispatched update', update);
-      dispatch(updateCircuitElements([update]));
       props.updateCallBack(update);
+      dispatch(updateCircuitElements([update]));
     };
 
     editorRef.current.onCircuitRemoved = (remove: CircuitElementRemove) => {
