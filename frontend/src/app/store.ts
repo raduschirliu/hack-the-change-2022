@@ -1,17 +1,16 @@
 import {
-  configureStore,
-  ThunkAction,
   Action,
+  ThunkAction,
+  configureStore,
   createImmutableStateInvariantMiddleware,
 } from '@reduxjs/toolkit';
-import counterReducer from './reducers/counterSlice';
-import documentReducer from './reducers/documentSlice';
+
 import authReducer from './reducers/user';
+import documentReducer from './reducers/documentSlice';
 import firebaseReducer from './reducers/firebase';
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
     document: documentReducer,
     auth: authReducer,
     firebase: firebaseReducer,

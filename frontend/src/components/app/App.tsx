@@ -1,9 +1,7 @@
 import './App.css';
 
-import { Counter } from '../counter/Counter';
 import logo from '../../res/logo.svg';
 import useWebSocket from 'react-use-websocket';
-
 
 const API_URL = process.env['REACT_APP_API_URL'];
 
@@ -22,11 +20,7 @@ function App() {
     shouldReconnect: (closeEvent) => true,
   });
 
-  return (
-    <div className="App">
-
-    </div>
-  );
+  return <div className="App"></div>;
 }
 
 export default App;
