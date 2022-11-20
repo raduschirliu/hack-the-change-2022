@@ -26,3 +26,5 @@ Footer
 
 # logs
 *.log
+
+__debug*

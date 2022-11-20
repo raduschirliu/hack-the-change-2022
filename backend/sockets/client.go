@@ -41,7 +41,13 @@ func (c *Client) Read() {
 			Elements:   []models.CircuitElement{},
 			Users:      users,
 		}
-		c.Conn.WriteJSON(res)
+		// c.Conn.WriteJSON(res)
+		for client, _ := range c.Pool.Clients {
+			if err := client.Conn.WriteJSON(res); err != nil {
+				log.Println(err)
+				return
+			}
+		}
 	}
 }
 

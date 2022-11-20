@@ -54,7 +54,9 @@ export default function DocumentPage() {
 
     if (isServerResponse(data)) {
       // Handle response
+      console.log('Server Response', data);
     } else if (isServerUpdateMessage(data)) {
+      console.log('Server Update Message', data);
       if (data.documentId !== documentId) {
         return;
       }
@@ -101,9 +103,9 @@ export default function DocumentPage() {
   const createElement = (element: CreateData) => {
     const requestId = uuid();
     const message: ClientMessage = {
-      requestId,
-      documentId,
-      userId,
+      requestId: requestId,
+      documentId: documentId,
+      userId: userId, // TODO: Replace with actual user id from store
       type: 'create',
       data: element,
     };
@@ -126,8 +128,30 @@ export default function DocumentPage() {
     // TODO: Handle storing request until response is received
   };
 
+  const handleTestButtonClick = () => {
+    // const element: CircuitElement = {
+    //   id: "yeeeet",
+    //   typeId: "woooot",
+    //   params: {
+    //     inputs: {},
+    //     outputs: {},
+    //     x: 69,
+    //     y: 420
+    //   }
+    // }
+    console.log('sending msg');
+    const d: CreateData = {
+      elementTypeId: 'yeeet',
+      x: 69,
+      y: 420,
+    };
+
+    createElement(d);
+  };
+
   return (
     <div className="w-screen h-screen overflow-hidden">
+      {/* <button onClick={handleTestButtonClick}>Test Button</button> */}
       <ToolsMenu documentId={documentId} />
       <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
         <PartsMenu />
