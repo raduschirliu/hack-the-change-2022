@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/raduschirliu/hack-the-change-2022/database"
 	"github.com/raduschirliu/hack-the-change-2022/models"
 	"github.com/raduschirliu/hack-the-change-2022/sockets"
 
@@ -57,29 +56,31 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 	}
 
 	if _, ok := Documents[message.DocumentId]; !ok {
-		docs := database.DocumentsCollection(*h.D)
-		doc, err := docs.GetDocument(message.DocumentId)
-		if err != nil {
-			pool := sockets.NewDocumentServer(message.DocumentId)
-			log.Println("starting new pool for id", message.DocumentId)
-			go pool.Start()
-			Documents[message.DocumentId] = *pool
-			client.Pool = pool
-			pool.Register <- client
-			client.Read()
-			res := models.ServerUpdateMessage{
-				DocumentId: message.DocumentId,
-				Users:      pool.GetUsers(),
-				Elements:   doc.Body,
-			}
-			client.Conn.WriteJSON(res)
+		pool := sockets.NewDocumentServer(message.DocumentId)
+		log.Println("starting new pool for id", message.DocumentId)
+		go pool.Start()
+		Documents[message.DocumentId] = *pool
+		client.Pool = pool
+		pool.Register <- client
+		res := models.ServerUpdateMessage{
+			DocumentId: message.DocumentId,
+			Users:      pool.GetUsers(),
+			Element:    models.CircuitElement{},
 		}
+		pool.Broadcast <- res
+		client.Read()
 
 	} else {
 		log.Println("have existing pool for id", message.DocumentId)
 		pool := Documents[message.DocumentId]
 		client.Pool = &pool
 		pool.Register <- client
+		res := models.ServerUpdateMessage{
+			DocumentId: message.DocumentId,
+			Users:      pool.GetUsers(),
+			Element:    models.CircuitElement{},
+		}
+		pool.Broadcast <- res
 		client.Read()
 	}
 }

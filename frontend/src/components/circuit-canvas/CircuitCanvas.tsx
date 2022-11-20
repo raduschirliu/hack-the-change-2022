@@ -12,11 +12,17 @@ import {
   CircuitElement,
   CircuitElementRemove,
   CircuitElementUpdate,
+  ClientMessageUpdateData,
 } from '../../types';
 
-interface CircuitCanvasProps {}
+interface CircuitCanvasProps {
+  updateCallBack: (update: ClientMessageUpdateData) => void;
+  deleteCallBack: (eID: string) => void;
+}
 
-export default function CircuitCanvas() {
+const CircuitCanvas: React.FC<CircuitCanvasProps> = (
+  props: CircuitCanvasProps
+) => {
   const twoDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<CircuitEditor | null>(null);
   const activeTool = useAppSelector(selectActiveTool);
@@ -32,11 +38,13 @@ export default function CircuitCanvas() {
     editorRef.current.onCircuitUpdated = (update: CircuitElementUpdate) => {
       console.log('dispatched update', update);
       dispatch(updateCircuitElements([update]));
+      props.updateCallBack(update);
     };
 
     editorRef.current.onCircuitRemoved = (remove: CircuitElementRemove) => {
       console.log('dispatched remove', remove);
       dispatch(removeCircuitElements([remove]));
+      props.deleteCallBack(remove.id);
     };
   }, [twoDivRef, dispatch]);
 
@@ -56,4 +64,6 @@ export default function CircuitCanvas() {
   }, [editorRef, elements]);
 
   return <div className="w-full h-full" ref={twoDivRef}></div>;
-}
+};
+
+export default CircuitCanvas;
