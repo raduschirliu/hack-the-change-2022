@@ -1,13 +1,14 @@
-import Two from 'two.js';
-import { Group } from 'two.js/src/group';
-import { Vector } from 'two.js/src/vector';
-import { ZUI } from 'two.js/extras/jsm/zui';
 import {
   CircuitElement,
   CircuitElementIO,
   CircuitElementRemove,
   CircuitElementUpdate,
 } from '../types';
+
+import { Group } from 'two.js/src/group';
+import Two from 'two.js';
+import { Vector } from 'two.js/src/vector';
+import { ZUI } from 'two.js/extras/jsm/zui';
 import elementDefinitions from './circuitElementDefinitions';
 import { Shape } from 'two.js/src/shape';
 
@@ -38,6 +39,8 @@ enum EditorToolState {
 
   // Connect tool selected
   Connect = 'connect',
+  // Element being connected
+  ConnectingElement = 'connectingElement',
 
   // Currently connecting two ports
   Connecting = 'connecting',
@@ -51,28 +54,23 @@ enum EditorToolState {
 
 type EditorToolData =
   | {
-      state: EditorToolState.Move;
+      state:
+        | EditorToolState.Move
+        | EditorToolState.Erase
+        | EditorToolState.Panning
+        | EditorToolState.Connect;
     }
   | {
       state: EditorToolState.MovingElement;
       element: CircuitElement;
     }
   | {
-      state: EditorToolState.Erase;
-    }
-  | {
-      state: EditorToolState.Panning;
-    }
-  | {
-      state: EditorToolState.Connect;
-    }
-  | {
-      state: EditorToolState.Connecting;
-      startElement: CircuitElement;
-      startIoPort: CircuitElementIO;
+      state: EditorToolState.ConnectingElement;
+      element: CircuitElement;
+      io: CircuitElementIO;
     };
 
-const IO_PORT_SIZE = 10;
+const IO_PORT_RADIUS = 10;
 const GRID_SIZE_PX = 10;
 const MOUSE_LEFT_BUTTON = 0;
 const MOUSE_MIDDLE_BUTTON = 1;
@@ -259,48 +257,85 @@ class CircuitEditor {
     this.setActiveTool(this.activeTool);
   }
 
-  private startConnectingIoPort(
+  private startConnectingElement(
     element: CircuitElement,
-    ioPort: CircuitElementIO
+    io: CircuitElementIO
   ) {
     if (this.toolState !== EditorToolState.Connect) {
-      console.error('Not currently in connect mode, cannot start connecting');
+      console.error('Cannot start connecting if not in Connect state');
       return;
     }
 
-    console.log('Start IO connection', element, ioPort);
+    console.log('Start connecting', element, io);
 
     this.toolData = {
-      state: EditorToolState.Connecting,
-      startElement: element,
-      startIoPort: ioPort,
+      state: EditorToolState.ConnectingElement,
+      element,
+      io,
     };
-
-    // TODO(radu): Make shape for local connections
   }
 
-  private stopConnectingIoPort() {
-    if (this.toolData.state !== EditorToolState.Connecting) {
-      console.error('Cannot stop connecting when not in connecting mode');
+  private stopConnectingElement(element: CircuitElement, io: CircuitElementIO) {
+    if (this.toolData.state !== EditorToolState.ConnectingElement) {
+      console.error('Cannot stop connecting if not currently connecting');
       return;
     }
 
-    // Determine if there is a valid port at mouse drop location
-    const endTarget = this.getIoPortAtMouse();
-    if (!endTarget) {
-      console.log('Invalid IO port at drop, not connecting');
+    if (this.toolData.element.id === element.id) {
+      console.error('Cannot connect to self');
       return;
     }
 
-    console.log('Ending connection with', endTarget);
+    if (this.toolData.io.type === io.type) {
+      console.error('Cannot connect to same type of IO');
+      return;
+    }
 
-    // TODO(radu): Make changes and send to store
+    // Create a connection between the two elements
+    this.onCircuitUpdated({
+      targetId: this.toolData.element.id,
+      params:
+        this.toolData.io.type === 'input'
+          ? {
+              inputs: {
+                [this.toolData.io.id]: element.id,
+              },
+            }
+          : {
+              outputs: {
+                [this.toolData.io.id]: element.id,
+              },
+            },
+    });
+    this.onCircuitUpdated({
+      targetId: element.id,
+      params:
+        this.toolData.io.type === 'input'
+          ? {
+              outputs: {
+                [io.id]: this.toolData.element.id,
+              },
+            }
+          : {
+              inputs: {
+                [io.id]: this.toolData.element.id,
+              },
+            },
+    });
+
+    console.log('Connected elements, submitted data');
+
+    this.toolData = {
+      state: EditorToolState.Connect,
+    };
   }
 
   /**
    * Set the active editor tool
    */
   setActiveTool(tool: EditorTool) {
+    console.log('Set active tool', tool);
+
     switch (tool) {
       case EditorTool.Move:
         this.setState(EditorToolState.Move);
@@ -349,8 +384,9 @@ class CircuitEditor {
         break;
 
       case EditorToolState.Connect:
-      case EditorToolState.Connecting:
-        if (this.getIoPortAtMouse()) {
+      case EditorToolState.ConnectingElement:
+        const ioTarget = this.getIoPortAtMouse();
+        if (ioTarget) {
           cursor = CursorMode.Pointer;
         }
         break;
@@ -388,7 +424,7 @@ class CircuitEditor {
       const path = new Two.Circle(
         input.xOffset,
         input.yOffset,
-        IO_PORT_SIZE / 2
+        IO_PORT_RADIUS / 2
       );
       path.fill = 'green';
       group.add(path);
@@ -401,7 +437,7 @@ class CircuitEditor {
       const path = new Two.Circle(
         output.xOffset,
         output.yOffset,
-        IO_PORT_SIZE / 2
+        IO_PORT_RADIUS / 2
       );
       path.fill = 'blue';
       group.add(path);
@@ -435,6 +471,7 @@ class CircuitEditor {
     });
 
     // TODO(radu): Also remove connection lines
+    // TODO: Remove all connections to this element
   }
 
   /**
@@ -456,65 +493,27 @@ class CircuitEditor {
     return new Two.Vector(event.clientX - rect.left, event.clientY - rect.top);
   }
 
-  private findElementPortAtPos(
-    pos: Vector,
-    element: CircuitElement
-  ): CircuitElementIO | null {
-    const definition = elementDefinitions[element.typeId];
-    const ports: CircuitElementIO[] = [
-      ...definition.inputs,
-      ...definition.outputs,
-    ];
-
-    for (const port of ports) {
-      const portShape = this.elementShapes[element.id][port.id];
-      if (!portShape) {
-        console.error('Element shape missing port', port, this.elementShapes);
-        return null;
-      }
-
-      const portAbsPos: Vector = new Vector(
-        element.params.x + port.xOffset,
-        element.params.y + port.yOffset
-      );
-      const bounds = {
-        left: portAbsPos.x - IO_PORT_SIZE / 2,
-        right: portAbsPos.x + IO_PORT_SIZE / 2,
-        top: portAbsPos.y - IO_PORT_SIZE / 2,
-        bottom: portAbsPos.y + IO_PORT_SIZE / 2,
-      };
-
-      if (
-        pos.x >= bounds.left &&
-        pos.x <= bounds.right &&
-        pos.y >= bounds.top &&
-        pos.y <= bounds.bottom
-      ) {
-        return port;
-      }
-    }
-
-    return null;
-  }
-
-  getIoPortAtMouse(): {
-    element: CircuitElement;
-    ioPort: CircuitElementIO;
-  } | null {
+  getIoPortAtMouse() {
     const pos = this.zui.clientToSurface(this.mousePos.x, this.mousePos.y);
 
-    for (const [, element] of Object.entries(this.elements)) {
-      const port = this.findElementPortAtPos(pos, element);
+    for (const element of this.elements) {
+      const definition = elementDefinitions[element.typeId];
+      const ioPorts = [...definition.inputs, ...definition.outputs];
 
-      if (port) {
-        return {
-          element,
-          ioPort: port,
-        };
+      for (const port of ioPorts) {
+        const portPos = new Two.Vector(
+          element.params.x + port.xOffset,
+          element.params.y + port.yOffset
+        );
+
+        if (portPos.distanceTo(pos) < IO_PORT_RADIUS) {
+          return {
+            element,
+            port: port,
+          };
+        }
       }
     }
-
-    return null;
   }
 
   /**
@@ -524,7 +523,7 @@ class CircuitEditor {
   getElementAtMouse(): CircuitElement | null {
     const pos = this.zui.clientToSurface(this.mousePos.x, this.mousePos.y);
 
-    for (const [, element] of Object.entries(this.elements)) {
+    for (const element of this.elements) {
       const definition = elementDefinitions[element.typeId];
       const bounds = {
         left: element.params.x - definition.width / 2,
@@ -562,10 +561,9 @@ class CircuitEditor {
         const target = this.getElementAtMouse();
         this.removeElement(target);
       } else if (this.toolState === EditorToolState.Connect) {
-        const targetPort = this.getIoPortAtMouse();
-
-        if (targetPort) {
-          this.startConnectingIoPort(targetPort.element, targetPort.ioPort);
+        const target = this.getIoPortAtMouse();
+        if (target) {
+          this.startConnectingElement(target.element, target.port);
         } else {
           this.startPanning();
         }
@@ -581,8 +579,11 @@ class CircuitEditor {
         this.stopPanning();
       } else if (this.toolState === EditorToolState.MovingElement) {
         this.stopMovingElement();
-      } else if (this.toolState === EditorToolState.Connecting) {
-        this.stopConnectingIoPort();
+      } else if (this.toolState === EditorToolState.ConnectingElement) {
+        const target = this.getIoPortAtMouse();
+        if (target) {
+          this.stopConnectingElement(target.element, target.port);
+        }
       }
     }
   }
@@ -597,8 +598,8 @@ class CircuitEditor {
       this.toolData.element.params.x += deltaPos.x;
       this.toolData.element.params.y += deltaPos.y;
       this.updateElementShape(this.toolData.element);
-    } else if (this.toolData.state === EditorToolState.Connecting) {
-      // TODO(radu): Update temporary connection line
+    } else if (this.toolData.state === EditorToolState.ConnectingElement) {
+      // TODO: Draw connection line
     }
 
     this.mousePos = newPos;

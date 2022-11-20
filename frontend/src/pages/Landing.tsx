@@ -26,7 +26,9 @@ export default function Landing() {
           <img src={circuitPic} alt="circuit" className="w-1/3 p-5" />
           <div className="flex flex-col justify-center max-w-md">
             <h2 className="text-center font-semibold text-3xl mb-5">
-              Welcome to our multi-player digital circuit builder!<br /><br />
+              Welcome to our multi-player digital circuit builder!
+              <br />
+              <br />
               Made for teaching kids the beginnings of electrical engineering.
             </h2>
           </div>

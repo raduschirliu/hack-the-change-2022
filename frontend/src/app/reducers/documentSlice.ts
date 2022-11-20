@@ -28,14 +28,14 @@ const initialState: DocumentState = {
       id: 'and',
       typeId: 'And',
       params: {
-        x: 0,
-        y: 0,
+        x: 300,
+        y: 150,
         inputs: {
-          input_0: 'wire_0',
-          input_1: 'wire_1',
+          input_0: 'input_0',
+          input_1: 'input_1',
         },
         outputs: {
-          output_0: 'wire_2',
+          output_0: 'output_0',
         },
       },
     },
@@ -43,12 +43,12 @@ const initialState: DocumentState = {
       id: 'input_0',
       typeId: 'Input',
       params: {
-        x: 0,
-        y: 0,
+        x: 180,
+        y: 120,
         state: true,
         inputs: {},
         outputs: {
-          output_0: 'wire_0',
+          output_0: 'and',
         },
       },
     },
@@ -56,12 +56,12 @@ const initialState: DocumentState = {
       id: 'input_1',
       typeId: 'Input',
       params: {
-        x: 0,
-        y: 0,
+        x: 180,
+        y: 180,
         state: false,
         inputs: {},
         outputs: {
-          output_0: 'wire_1',
+          output_0: 'and',
         },
       },
     },
@@ -69,54 +69,12 @@ const initialState: DocumentState = {
       id: 'output',
       typeId: 'Output',
       params: {
-        x: 0,
-        y: 0,
+        x: 450,
+        y: 150,
         inputs: {
-          input_0: 'wire_2',
+          input_0: 'and',
         },
         outputs: {},
-      },
-    },
-    {
-      id: 'wire_0',
-      typeId: 'Wire',
-      params: {
-        x: 0,
-        y: 0,
-        inputs: {
-          input: 'input_0',
-        },
-        outputs: {
-          output: 'and',
-        },
-      },
-    },
-    {
-      id: 'wire_1',
-      typeId: 'Wire',
-      params: {
-        x: 0,
-        y: 0,
-        inputs: {
-          input: 'input_1',
-        },
-        outputs: {
-          output: 'and',
-        },
-      },
-    },
-    {
-      id: 'wire_2',
-      typeId: 'Wire',
-      params: {
-        x: 0,
-        y: 0,
-        inputs: {
-          input: 'and',
-        },
-        outputs: {
-          output: 'output',
-        },
       },
     },
   ],

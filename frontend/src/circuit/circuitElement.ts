@@ -58,6 +58,7 @@ function buildWireConnection(
   }
 
   // wire.params.inputs[WIRE_INPUT_ID] = start.
+  return wire;
 }
 
 export { buildCircuitElement };
