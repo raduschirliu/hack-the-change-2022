@@ -1,13 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
+  removeCircuitElements,
   selectActiveTool,
   selectElements,
   updateCircuitElements,
 } from '../../app/reducers/documentSlice';
 import CircuitEditor from '../../circuit/circuitEditor';
 
-import { CircuitElement, CircuitElementUpdate } from '../../types';
+import { CircuitElement, CircuitElementRemove, CircuitElementUpdate } from '../../types';
 
 interface CircuitCanvasProps {
   circuitState: CircuitElement[];
@@ -25,9 +26,15 @@ export default function CircuitCanvas({ circuitState }: CircuitCanvasProps) {
     if (editorRef.current || !twoDivRef.current) return;
 
     editorRef.current = new CircuitEditor(twoDivRef.current);
+
     editorRef.current.onCircuitUpdated = (update: CircuitElementUpdate) => {
       console.log('dispatched update', update);
       dispatch(updateCircuitElements([update]));
+    };
+
+    editorRef.current.onCircuitRemoved = (remove: CircuitElementRemove) => {
+      console.log('dispatched remove', remove);
+      dispatch(removeCircuitElements([remove]));
     };
   }, [twoDivRef, dispatch]);
 

@@ -3,6 +3,7 @@ import { EditorTool } from '../../circuit/circuitEditor';
 import {
   CircuitDocument,
   CircuitElement,
+  CircuitElementRemove,
   CircuitElementUpdate,
 } from '../../types';
 import { updateCircuitState } from '../../utils';
@@ -36,11 +37,28 @@ export const documentSlice = createSlice({
         elements: [...state.elements, action.payload],
       };
     },
-    removeCircuitElement: (state: DocumentState) => {},
+    removeCircuitElements: (
+      state: DocumentState,
+      action: PayloadAction<CircuitElementRemove[]>
+    ) => {
+      const idsToRemove = action.payload.map((remove) => remove.targetId);
+      console.log('removing ids', idsToRemove);
+
+      // TODO: Send this event to the backend
+
+      return {
+        ...state,
+        elements: state.elements.filter(
+          (element) => !idsToRemove.includes(element.id)
+        ),
+      };
+    },
     updateCircuitElements: (
       state: DocumentState,
       action: PayloadAction<CircuitElementUpdate[]>
     ) => {
+      // TODO: Send this event to the backend
+
       return {
         ...state,
         elements: updateCircuitState(state.elements, action.payload),
@@ -61,7 +79,7 @@ export const documentSlice = createSlice({
 /* Actions */
 export const {
   addCircuitElement,
-  removeCircuitElement,
+  removeCircuitElements,
   updateCircuitElements,
   setActiveTool,
 } = documentSlice.actions;

@@ -53,6 +53,9 @@ type EditorToolData =
       element: CircuitElement;
     }
   | {
+      state: EditorToolState.Erase;
+    }
+  | {
       state: EditorToolState.Panning;
     };
 
@@ -141,9 +144,12 @@ class CircuitEditor {
       (key) => !elementKeys.includes(key)
     );
 
-    for (const key in shapesToRemove) {
-      this.elementShapes[key].remove();
-      delete this.elementShapes[key];
+    for (const key of shapesToRemove) {
+      console.log(key);
+      if (this.elementShapes[key]) {
+        this.elementShapes[key].remove();
+        delete this.elementShapes[key];
+      }
     }
 
     // Build all the element shapes
@@ -157,6 +163,12 @@ class CircuitEditor {
       case EditorToolState.Move:
         this.toolData = {
           state: EditorToolState.Move,
+        };
+        break;
+
+      case EditorToolState.Erase:
+        this.toolData = {
+          state: EditorToolState.Erase,
         };
         break;
 
@@ -333,7 +345,9 @@ class CircuitEditor {
   removeElement(element: CircuitElement | null) {
     if (!element) return;
 
-    // TODO(radu): update the redux store, send info to server
+    this.onCircuitRemoved({
+      targetId: element.id,
+    });
   }
 
   /**
