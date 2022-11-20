@@ -29,12 +29,12 @@ func (c *Client) Read() {
 		}
 		log.Println(msg)
 
-		users := c.Pool.GetUsers()
+		// users := c.Pool.GetUsers()
 
 		res := models.ServerUpdateMessage{
-			DocumentId: msg.DocumentId,
+			DocumentId: "1234",
 			Elements:   []models.CircuitElementUpdate{},
-			Users:      users,
+			Users:      []string{},
 		}
 		c.Conn.WriteJSON(res)
 	}

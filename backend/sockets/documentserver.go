@@ -23,8 +23,7 @@ func (pool *DocumentServer) Start() {
 			break
 		case client := <-pool.Unregister:
 			delete(pool.Clients, client)
-			log.Println("removed existing client", client.ID)
-
+			pool.HandleDisconnect()
 			break
 		case message := <-pool.Broadcast:
 			log.Println("Sending message to all clients")
@@ -54,7 +53,13 @@ func (pool *DocumentServer) HandleDisconnect() {
 			Users:      users,
 			Elements:   []models.CircuitElementUpdate{},
 		}
-		pool.Broadcast <- msg
+		for client, _ := range pool.Clients {
+			log.Println(msg)
+			if err := client.Conn.WriteJSON(msg); err != nil {
+				log.Println(err)
+				return
+			}
+		}
 	} else {
 		log.Println("Stale Pool")
 	}
