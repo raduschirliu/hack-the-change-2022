@@ -58,7 +58,7 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 
 	if _, ok := Documents[message.DocumentId]; !ok {
 		docs := database.DocumentsCollection(*h.D)
-		doc, err := docs.GetDocument(message.DocumentId)
+		_, err := docs.GetDocument(message.DocumentId)
 		if err != nil {
 			pool := sockets.NewDocumentServer(message.DocumentId)
 			log.Println("starting new pool for id", message.DocumentId)
@@ -66,13 +66,13 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 			Documents[message.DocumentId] = *pool
 			client.Pool = pool
 			pool.Register <- client
-			client.Read()
 			res := models.ServerUpdateMessage{
 				DocumentId: message.DocumentId,
 				Users:      pool.GetUsers(),
-				Elements:   doc.Body,
+				Element:    models.CircuitElement{},
 			}
-			client.Conn.WriteJSON(res)
+			pool.Broadcast <- res
+			client.Read()
 		}
 
 	} else {
@@ -80,6 +80,12 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 		pool := Documents[message.DocumentId]
 		client.Pool = &pool
 		pool.Register <- client
+		res := models.ServerUpdateMessage{
+			DocumentId: message.DocumentId,
+			Users:      pool.GetUsers(),
+			Element:    models.CircuitElement{},
+		}
+		pool.Broadcast <- res
 		client.Read()
 	}
 }
