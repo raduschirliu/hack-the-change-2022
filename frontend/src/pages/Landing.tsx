@@ -19,7 +19,7 @@ const getDocumentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
 export default function Landing() {
   return (
     <div className="bg-cyan-100">
-      <LandNav />
+      <LandNav shouldNotDisplayLogInOut={true} />
       {/* <!-- Jumbotron --> */}
       <div className="h-screen p-6 shadow-lg rounded-lg bg-cyan-100 text-gray-700">
         <div className="flex flex-row justify-center">

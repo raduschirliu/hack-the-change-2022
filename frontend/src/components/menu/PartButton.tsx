@@ -1,3 +1,4 @@
+import elementDefinitions from '../../circuit/circuitElementDefinitions';
 import { CircuitElementDefinition } from '../../types';
 
 interface IProps {
@@ -5,14 +6,20 @@ interface IProps {
   onClicked: (label: string) => void;
 }
 
+const buttonClasses =
+  'hover:opacity-70 inline-block w-full py-10 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out';
+
 export function PartButton({ circuitElement, onClicked }: IProps) {
+  // const colorClass = `bg-[${circuitElement.color}]`;
+
   return (
     <button
       type="button"
       data-mdb-ripple="true"
       data-mdb-ripple-color="light"
-      className="inline-block w-full py-10 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+      className={buttonClasses}
       title={circuitElement.label}
+      style={{ backgroundColor: circuitElement.color }}
       onClick={() => {
         onClicked(circuitElement.typeId);
       }}
