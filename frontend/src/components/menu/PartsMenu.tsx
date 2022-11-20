@@ -19,7 +19,7 @@ export function PartsMenu() {
   };
 
   return (
-    <div className="w-full h-full shadow-md bg-white px-2">
+    <div className="w-full h-full shadow-md bg-cyan-50 px-2">
       <div className="grid grid-cols-2 mt-12 text-center gap-4">
         {Object.entries(elementDefinitions).map(([id, part]) => {
           if (!part.visibleInToolbox) return null;

@@ -21,11 +21,11 @@ export default function Landing() {
     <div>
       <LandNav />
       {/* <!-- Jumbotron --> */}
-      <div className="h-full p-6 shadow-lg rounded-lg bg-blue-100 text-gray-700">
+      <div className="h-full p-6 shadow-lg rounded-lg bg-cyan-100 text-gray-700">
         <div className="flex flex-row justify-center">
           <img src={circuitPic} alt="circuit" className="w-1/3 p-5" />
           <div className="flex flex-col justify-center max-w-md">
-            <h2 className="text-center font-semibold text-3xl mb-5">
+            <h2 className="text-center text-3xl mb-5">
               Welcome to our multi-player digital circuit builder!<br /><br />
               Made for teaching kids the beginnings of electrical engineering.
             </h2>

@@ -19,7 +19,7 @@ interface IProps {
 }
 
 const buttonClasses =
-  'ml-4 inline-block px-5 py-5 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out';
+  'ml-4 inline-block px-5 py-5 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-violet-500 hover:shadow-lg focus:bg-violet-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-violet-500 active:shadow-lg transition duration-150 ease-in-out';
 
 export function ToolsMenu({ documentId, onPlayClick }: IProps) {
   const activeTool = useAppSelector(selectActiveTool);
@@ -27,7 +27,7 @@ export function ToolsMenu({ documentId, onPlayClick }: IProps) {
 
   function getButtonClass(tool: EditorTool): string {
     return `${buttonClasses} ${
-      tool === activeTool ? 'bg-blue-700' : 'bg-gray-300'
+      tool === activeTool ? 'bg-violet-500' : 'bg-gray-300'
     }`;
   }
 
@@ -44,11 +44,11 @@ export function ToolsMenu({ documentId, onPlayClick }: IProps) {
         items-center
         justify-between
         py-3
-        bg-gray-100
+        bg-cyan-50
         text-gray-500
         hover:text-gray-700
         focus:text-gray-700
-        shadow-lg
+        shadow-md
         navbar navbar-expand-lg navbar-light
         gap-x-4
       "
@@ -107,7 +107,7 @@ export function ToolsMenu({ documentId, onPlayClick }: IProps) {
           type="button"
           data-mdb-ripple="true"
           data-mdb-ripple-color="light"
-          className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-150 ease-in-out"
+          className="px-5 bg-gray-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-violet-500 hover:shadow-lg transition duration-150 ease-in-out"
           title="Logout"
           onClick={onLogoutPress}
         >
