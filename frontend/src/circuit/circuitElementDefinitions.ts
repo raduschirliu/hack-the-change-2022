@@ -1,9 +1,40 @@
 import { CircuitElementDefinition } from '../types';
 
+const defaultDefinition: Partial<CircuitElementDefinition> = {
+  visibleInToolbox: false,
+};
+
 const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
+  Wire: {
+    ...defaultDefinition,
+    typeId: 'Wire',
+    label: 'Wire',
+    color: 'black',
+    width: 1,
+    height: 1,
+    inputs: [
+      {
+        id: 'input',
+        type: 'input',
+        xOffset: 0,
+        yOffset: 0,
+      },
+    ],
+    outputs: [
+      {
+        id: 'output',
+        type: 'output',
+        xOffset: 0,
+        yOffset: 0,
+      },
+    ],
+    truthTable: [],
+  },
   AndGate: {
+    ...defaultDefinition,
     typeId: 'AndGate',
     label: 'And Gate',
+    visibleInToolbox: true,
     color: 'pink',
     width: 50,
     height: 100,
@@ -29,6 +60,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
         yOffset: 0,
       },
     ],
+    truthTable: [],
   },
 };
 

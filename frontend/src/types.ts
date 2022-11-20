@@ -41,6 +41,8 @@ export type CircuitElementIO = {
   yOffset: number;
 };
 
+export type CircuitElementTruthTable = { [key: string]: boolean }[];
+
 export type CircuitElementDefinition = {
   typeId: string;
   label: string;
@@ -51,6 +53,8 @@ export type CircuitElementDefinition = {
   color: string;
   inputs: CircuitElementIO[];
   outputs: CircuitElementIO[];
+  truthTable: CircuitElementTruthTable;
+  visibleInToolbox?: boolean;
 };
 
 export type CircuitElementParams = {
