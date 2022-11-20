@@ -1,13 +1,14 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { EditorTool } from '../../circuit/circuitEditor';
+import { AppThunk, RootState } from '../store';
 import {
   CircuitDocument,
   CircuitElement,
   CircuitElementRemove,
   CircuitElementUpdate,
 } from '../../types';
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
+import { EditorTool } from '../../circuit/circuitEditor';
 import { updateCircuitState } from '../../utils';
-import { RootState, AppThunk } from '../store';
 
 /* State type */
 export interface DocumentState {
@@ -18,8 +19,107 @@ export interface DocumentState {
 
 /* Initial state */
 const initialState: DocumentState = {
-  document: null,
-  elements: [],
+  document: {
+    uuid: 'test',
+    name: 'Test',
+  },
+  elements: [
+    {
+      id: 'and',
+      typeId: 'And',
+      params: {
+        x: 0,
+        y: 0,
+        inputs: {
+          input_0: 'wire_0',
+          input_1: 'wire_1',
+        },
+        outputs: {
+          output_0: 'wire_2',
+        },
+      },
+    },
+    {
+      id: 'input_0',
+      typeId: 'Input',
+      params: {
+        x: 0,
+        y: 0,
+        state: true,
+        inputs: {},
+        outputs: {
+          output_0: 'wire_0',
+        },
+      },
+    },
+    {
+      id: 'input_1',
+      typeId: 'Input',
+      params: {
+        x: 0,
+        y: 0,
+        state: false,
+        inputs: {},
+        outputs: {
+          output_0: 'wire_1',
+        },
+      },
+    },
+    {
+      id: 'output',
+      typeId: 'Output',
+      params: {
+        x: 0,
+        y: 0,
+        inputs: {
+          input_0: 'wire_2',
+        },
+        outputs: {},
+      },
+    },
+    {
+      id: 'wire_0',
+      typeId: 'Wire',
+      params: {
+        x: 0,
+        y: 0,
+        inputs: {
+          input: 'input_0',
+        },
+        outputs: {
+          output: 'and',
+        },
+      },
+    },
+    {
+      id: 'wire_1',
+      typeId: 'Wire',
+      params: {
+        x: 0,
+        y: 0,
+        inputs: {
+          input: 'input_1',
+        },
+        outputs: {
+          output: 'and',
+        },
+      },
+    },
+    {
+      id: 'wire_2',
+      typeId: 'Wire',
+      params: {
+        x: 0,
+        y: 0,
+        inputs: {
+          input: 'and',
+        },
+        outputs: {
+          output: 'output',
+        },
+      },
+    },
+  ],
   activeTool: EditorTool.Move,
 };
 

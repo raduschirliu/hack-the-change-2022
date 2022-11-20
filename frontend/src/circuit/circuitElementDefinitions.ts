@@ -28,12 +28,19 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
         yOffset: 0,
       },
     ],
-    truthTable: [],
+    truthTable: {
+      '0': {
+        output: false,
+      },
+      '1': {
+        output: true,
+      },
+    },
   },
-  AndGate: {
+  And: {
     ...defaultDefinition,
-    typeId: 'AndGate',
-    label: 'And Gate',
+    typeId: 'And',
+    label: 'And',
     visibleInToolbox: true,
     color: 'pink',
     width: 50,
@@ -60,7 +67,56 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
         yOffset: 0,
       },
     ],
-    truthTable: [],
+    truthTable: {
+      '00': {
+        output_0: false,
+      },
+      '01': {
+        output_0: false,
+      },
+      '10': {
+        output_0: false,
+      },
+      '11': {
+        output_0: true,
+      },
+    },
+  },
+  Input: {
+    ...defaultDefinition,
+    typeId: 'Input',
+    label: 'Input',
+    color: 'lightblue',
+    width: 50,
+    height: 50,
+    inputs: [],
+    outputs: [
+      {
+        id: 'output_0',
+        type: 'output',
+        xOffset: 25,
+        yOffset: 0,
+      },
+    ],
+    truthTable: {},
+  },
+  Output: {
+    ...defaultDefinition,
+    typeId: 'Output',
+    label: 'Output',
+    color: 'lightgreen',
+    width: 50,
+    height: 50,
+    inputs: [
+      {
+        id: 'input_0',
+        type: 'input',
+        xOffset: -25,
+        yOffset: 0,
+      },
+    ],
+    outputs: [],
+    truthTable: {},
   },
 };
 

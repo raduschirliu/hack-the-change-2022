@@ -8,18 +8,19 @@ import {
   UpdateData,
 } from '../types';
 import { isServerResponse, isServerUpdateMessage } from '../typeGuards';
+import { useEffect, useState } from 'react';
 
 import CircuitCanvas from '../components/circuit-canvas/CircuitCanvas';
+import { CircuitSimulation } from '../circuit/circuitSimulation';
 import { JsonValue } from 'react-use-websocket/dist/lib/types';
 import { PartsMenu } from '../components/menu/PartsMenu';
 import { ToolsMenu } from '../components/menu/ToolsMenu';
+import { selectUser } from '../app/reducers/user';
 import { updateCircuitState } from '../utils';
+import { useAppSelector } from '../app/hooks';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { v4 as uuid } from 'uuid';
-import { selectUser } from '../app/reducers/user';
-import { useAppSelector } from '../app/hooks';
 
 let socketUrl = `${process.env['REACT_APP_API_URL']}/ws`;
 socketUrl = socketUrl.replace('https', 'ws');
@@ -128,35 +129,21 @@ export default function DocumentPage() {
     // TODO: Handle storing request until response is received
   };
 
-  const handleTestButtonClick = () => {
-    // const element: CircuitElement = {
-    //   id: "yeeeet",
-    //   typeId: "woooot",
-    //   params: {
-    //     inputs: {},
-    //     outputs: {},
-    //     x: 69,
-    //     y: 420
-    //   }
-    // }
-    console.log('sending msg');
-    const d: CreateData = {
-      elementTypeId: 'yeeet',
-      x: 69,
-      y: 420,
-    };
-
-    createElement(d);
+  const onPlayClick = () => {
+    const simulation = new CircuitSimulation();
+    const solution = simulation.solve();
+    console.log(solution);
   };
 
   return (
-    <div className="w-screen h-screen overflow-hidden">
-      {/* <button onClick={handleTestButtonClick}>Test Button</button> */}
-      <ToolsMenu documentId={documentId} />
-      <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
-        <PartsMenu />
-        <CircuitCanvas circuitState={circuitState} />
+    <>
+      <div className="w-screen h-screen overflow-hidden">
+        <ToolsMenu documentId={documentId} onPlayClick={onPlayClick} />
+        <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
+          <PartsMenu />
+          <CircuitCanvas circuitState={circuitState} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

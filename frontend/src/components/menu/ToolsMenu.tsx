@@ -1,25 +1,27 @@
-import { ReactComponent as Delete } from '@material-design-icons/svg/filled/delete.svg';
-import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
-import { Link } from 'react-router-dom';
-import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
   selectActiveTool,
   setActiveTool,
 } from '../../app/reducers/documentSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+
+import { ReactComponent as Delete } from '@material-design-icons/svg/filled/delete.svg';
 import { EditorTool } from '../../circuit/circuitEditor';
+import { ReactComponent as Hand } from '@material-design-icons/svg/filled/back_hand.svg';
+import { Link } from 'react-router-dom';
+import { ReactComponent as Play } from '@material-design-icons/svg/filled/play_arrow.svg';
 import { ReactComponent as Wire } from '@material-design-icons/svg/filled/edit.svg';
-import logo from '../../res/logo.png';
 import { clearUser } from '../../app/reducers/user';
+import logo from '../../res/logo.png';
 
 interface IProps {
   documentId: string;
+  onPlayClick: () => void;
 }
 
 const buttonClasses =
   'ml-4 inline-block px-5 py-5 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out';
 
-export function ToolsMenu({ documentId }: IProps) {
+export function ToolsMenu({ documentId, onPlayClick }: IProps) {
   const activeTool = useAppSelector(selectActiveTool);
   const dispatch = useAppDispatch();
 
@@ -95,7 +97,8 @@ export function ToolsMenu({ documentId }: IProps) {
         data-mdb-ripple-color="light"
         title="Run Simulation"
         className={getButtonClass(EditorTool.Simulate)}
-        onClick={() => dispatch(setActiveTool(EditorTool.Simulate))}
+        // onClick={() => dispatch(setActiveTool(EditorTool.Simulate))}
+        onClick={onPlayClick}
       >
         <Play className="fill-white" />
       </button>

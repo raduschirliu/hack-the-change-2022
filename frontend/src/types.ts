@@ -41,7 +41,9 @@ export type CircuitElementIO = {
   yOffset: number;
 };
 
-export type CircuitElementTruthTable = { [key: string]: boolean }[];
+// { inputString: { outputId: boolean } }
+// e.g. { '00': { 'output_1': true } }
+export type CircuitElementTruthTable = Record<string, Record<string, boolean>>;
 
 export type CircuitElementDefinition = {
   typeId: string;
@@ -60,6 +62,7 @@ export type CircuitElementDefinition = {
 export type CircuitElementParams = {
   x: number;
   y: number;
+  state?: boolean; // State for input elements
   inputs: { [key: string]: string | null };
   outputs: { [key: string]: string | null };
 };
@@ -77,7 +80,7 @@ export type CircuitElementUpdate = {
 
 export type CircuitElementRemove = {
   targetId: string;
-}
+};
 
 export type ServerUpdateMessage = {
   documentId: string; // The ID of the document that the message is for
