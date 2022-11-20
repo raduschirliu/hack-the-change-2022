@@ -46,7 +46,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     typeId: 'And',
     label: 'And',
     visibleInToolbox: true,
-    color: 'pink',
+    color: '#67e8f9',
     width: 50,
     height: 100,
     inputs: [
@@ -91,7 +91,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Input',
     label: 'Input',
-    color: 'lightblue',
+    color: '#059669',
     width: 50,
     height: 50,
     inputs: [],
@@ -110,7 +110,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Output',
     label: 'Output',
-    color: 'lightgreen',
+    color: '#fde047',
     width: 50,
     height: 50,
     inputs: [
@@ -129,7 +129,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Not',
     label: 'Not',
-    color: 'orange',
+    color: '#6ee7b7',
     width: 50,
     height: 50,
     inputs: [
@@ -162,7 +162,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Or',
     label: 'Or',
-    color: 'yellow',
+    color: '#a5b4fc',
     width: 50,
     height: 100,
     inputs: [
@@ -207,7 +207,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Xor',
     label: 'Xor',
-    color: 'purple',
+    color: '#f0abfc',
     width: 50,
     height: 100,
     inputs: [
@@ -252,7 +252,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Nand',
     label: 'Nand',
-    color: 'red',
+    color: '#0284c7',
     width: 50,
     height: 100,
     inputs: [
@@ -297,7 +297,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Nor',
     label: 'Nor',
-    color: 'blue',
+    color: '#4f46e5',
     width: 50,
     height: 100,
     inputs: [
@@ -342,7 +342,7 @@ const elementDefinitions: { [key: string]: CircuitElementDefinition } = {
     visibleInToolbox: true,
     typeId: 'Xnor',
     label: 'Xnor',
-    color: 'green',
+    color: '#9333ea',
     width: 50,
     height: 100,
     inputs: [
