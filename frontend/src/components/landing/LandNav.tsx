@@ -9,7 +9,7 @@ import { clearUser } from '../../app/reducers/user';
 import { useAppDispatch } from '../../app/hooks';
 
 interface ILandNavProps {
-  shouldNotDisplayLogInOut?: boolean;
+  shouldNotDisplayLogInOut: boolean;
 }
 
 export const LandNav: React.FC<ILandNavProps> = (props: ILandNavProps) => {
@@ -43,7 +43,7 @@ export const LandNav: React.FC<ILandNavProps> = (props: ILandNavProps) => {
         </p>
       </a>
       <div className="ml-auto mr-4 flex-col space-y-1 space-x-2">
-        {!props.shouldNotDisplayLogInOut && (
+        {props.shouldNotDisplayLogInOut && (
           <>
             <Link to="/sign-in">
               <button

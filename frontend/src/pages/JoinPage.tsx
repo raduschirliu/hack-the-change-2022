@@ -18,7 +18,7 @@ export default function JoinPage() {
   const navigate = useNavigate();
 
   const onCreateDocumentButtonPress = async () => {
-    let c: CreateCircuitDocument = {
+    const c: CreateCircuitDocument = {
       name: circuitName,
     };
     const res = await axios.post(documentUrl, c);

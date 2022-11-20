@@ -8,7 +8,7 @@ export const updateCircuitState = (
 ): CircuitElement[] => {
   console.log('payload', elementUpdates);
   // A foul hack for deep copy
-  let circuitState: CircuitElement[] = JSON.parse(
+  const circuitState: CircuitElement[] = JSON.parse(
     JSON.stringify(originalCircuitState)
   );
 

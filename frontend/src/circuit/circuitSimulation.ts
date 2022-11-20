@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import elementDefinitions from '../circuit/circuitElementDefinitions';
 import { store } from '../app/store';
 

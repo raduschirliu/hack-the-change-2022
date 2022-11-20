@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { CircuitElement, ServerUpdateMessage } from './types';
 
 export const isCircuitElement = (data: any): data is CircuitElement => {
