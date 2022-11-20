@@ -1,18 +1,85 @@
 import { CircuitDocument } from '../types';
 import { Link } from 'react-router-dom';
 import useAxios from 'axios-hooks';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { JoinNav } from '../components/join/JoinNav';
+import { CircuitList } from '../components/join/CircuitList';
 
-const documentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
+const getDocumentsUrl = `${process.env['REACT_APP_API_URL']}/api/documents`;
+const postDocumentUrl = `${process.env['REACT_APP_API_URL']}/api/document`;
 
 export default function JoinPage() {
-  const [{ data, loading, error }] = useAxios<CircuitDocument[]>(documentsUrl);
+  const [
+    { data: documents, loading: documentsLoading, error: documentsError },
+  ] = useAxios<CircuitDocument[]>(getDocumentsUrl);
+
   const [userId, setUserId] = useState('');
+  const [circuitName, setCircuitName] = useState('');
 
   return (
     <div>
-      <h1>Circuit App</h1>
-      <p>Made with ❤️ by webbrothers</p>
+      <JoinNav />
+      {/* <!-- Jumbotron --> */}
+      <div className="h-full p-6 shadow-lg rounded-lg bg-blue-100 text-gray-700">
+        <h2 className="text-center font-semibold text-3xl mb-5">
+          Welcome back to app name!
+        </h2>
+        <hr className="my-6 border-gray-300" />
+        {/* Create new circuit */}
+        <p className="text-center">Start a new multiplayer circuit...</p>
+        <br />
+        <div className="flex justify-center">
+          <div className="mb-3 w-96">
+            <input
+              type="text"
+              className="
+                form-control
+                block
+                w-full
+                px-3
+                py-1.5
+                text-base
+                font-normal
+                text-gray-700
+                bg-white bg-clip-padding
+                border border-solid border-gray-300
+                rounded
+                m-0
+                focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+              "
+              id="exampleText0"
+              placeholder="Name of your new circuit"
+              value={circuitName}
+              onChange={(e) => setCircuitName(e.target.value)}
+            />
+            <div className="mt-1.5 flex justify-center">
+              <button
+                type="button"
+                className="block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+                onClick={() => {
+                  // TODO: make axios request to make document
+                }}
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+        <hr className="my-6 border-gray-300" />
+        {/* Join existing circuit */}
+        <p className="text-center">Or open an existing circuit...</p>
+        <br />
+        <CircuitList
+          documentList={documents}
+          loading={documentsLoading}
+          error={documentsError}
+        />
+        <hr className="my-6 border-gray-300" />
+        <p className="text-xs">Made with ❤️ by webbrothers</p>
+      </div>
+      {/* <!-- End jumbotron --> */}
+      {/* <h1>Circuit App</h1>
+      
       <label>
         User
         <input
@@ -23,18 +90,18 @@ export default function JoinPage() {
       </label>
       <h3>Documents</h3>
       <div>
-        {loading || data === undefined ? (
+        {documentsLoading || documents === undefined ? (
           <p>Loading...</p>
-        ) : error ? (
-          <p>Error! {error.message}</p>
+        ) : documentsError ? (
+          <p>Error! {documentsError.message}</p>
         ) : (
-          data.map((doc, index) => (
+          documents.map((doc, index) => (
             <Link key={index} to={`/document/${doc.uuid}`}>
-              {doc.uuid}
+              {doc.name + '\n'}
             </Link>
           ))
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
