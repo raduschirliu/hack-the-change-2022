@@ -1,4 +1,9 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import {
+  configureStore,
+  ThunkAction,
+  Action,
+  createImmutableStateInvariantMiddleware,
+} from '@reduxjs/toolkit';
 import counterReducer from './reducers/counterSlice';
 import documentReducer from './reducers/documentSlice';
 import authReducer from './reducers/user';
@@ -11,6 +16,9 @@ export const store = configureStore({
     auth: authReducer,
     firebase: firebaseReducer,
   },
+  middleware: [
+    createImmutableStateInvariantMiddleware({ ignore: ['auth', 'firebase'] }),
+  ],
 });
 
 export type AppDispatch = typeof store.dispatch;
