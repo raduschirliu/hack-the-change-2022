@@ -1,7 +1,7 @@
 /* eslint-disable */
 
+import { CircuitElement } from '../types';
 import elementDefinitions from '../circuit/circuitElementDefinitions';
-import { store } from '../app/store';
 
 type Node = {
   id: string;
@@ -23,7 +23,7 @@ type NodeSolution = {
   outputs?: { [key: string]: boolean }; // Key is output ID
 };
 
-type Solution = {
+export type Solution = {
   // Key is element ID
   [key: string]: NodeSolution;
 };
@@ -33,11 +33,7 @@ export class CircuitSimulation {
   outputNodes: Node[] = [];
   solution: Solution = {};
 
-  constructor() {
-    // Get elements from store
-    const { document } = store.getState();
-    const { elements } = document;
-
+  constructor(elements: CircuitElement[]) {
     // Create a map of element IDs to nodes
     const nodes: Record<string, Node> = {};
     for (const element of elements) {

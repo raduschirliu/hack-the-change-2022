@@ -8,27 +8,28 @@ import {
   CircuitElementUpdate,
   RecursivePartial,
 } from '../types';
+import {
+  CircuitElementIoPortTuple,
+  buildWireConnection,
+  getWireId,
+} from './circuitElement';
+import { CircuitSimulation, Solution } from './circuitSimulation';
 import elementDefinitions, {
   WIRE_INPUT_ID,
   WIRE_OUTPUT_ID,
   WIRE_TYPE_ID,
 } from './circuitElementDefinitions';
 
-import { Group } from 'two.js/src/group';
-import { Shape } from 'two.js/src/shape';
-import {
-  buildWireConnection,
-  CircuitElementIoPortTuple,
-  getWireId,
-} from './circuitElement';
-import { Path } from 'two.js/src/path';
 import { Anchor } from 'two.js/src/anchor';
-import { throws } from 'assert';
+import { Group } from 'two.js/src/group';
 import { Line } from 'two.js/src/shapes/line';
+import { Path } from 'two.js/src/path';
+import { Shape } from 'two.js/src/shape';
 import Two from 'two.js';
 import { Vector } from 'two.js/src/vector';
 import { ZUI } from 'two.js/extras/jsm/zui';
 import { merge } from 'lodash';
+import { throws } from 'assert';
 
 export enum CursorMode {
   Default = 'default',
@@ -85,6 +86,10 @@ type EditorToolData =
       element: CircuitElement;
       io: CircuitElementIO;
       wirePath: Path;
+    }
+  | {
+      state: EditorToolState.Simulate;
+      solution: Solution;
     };
 
 const IO_PORT_RADIUS = 10;
@@ -230,12 +235,27 @@ class CircuitEditor {
         };
         break;
 
+      case EditorToolState.Simulate:
+        this.runSimulation();
+        break;
+
       default:
         console.error('Unimplemented state: ', newState);
         break;
     }
   }
 
+  runSimulation() {
+    const simulation = new CircuitSimulation(this.elements);
+    const solution = simulation.solve();
+
+    console.log(solution);
+
+    this.toolData = {
+      state: EditorToolState.Simulate,
+      solution,
+    };
+  }
   private startMovingElement(element: CircuitElement) {
     if (this.toolState !== EditorToolState.Move) {
       console.error('Invalid state transition to MoveElement');
@@ -658,6 +678,22 @@ class CircuitEditor {
     this.stage.add(group);
   }
 
+  toggleElement(element: CircuitElement) {
+    if (element.typeId !== 'Input') {
+      return;
+    }
+
+    this.onCircuitUpdated({
+      ...element,
+      params: {
+        ...element.params,
+        state: !element.params.state,
+      },
+    });
+
+    this.runSimulation();
+  }
+
   updateTempWireShape(newPos: Vector) {
     if (this.toolData.state !== EditorToolState.ConnectingElement) {
       console.error('Cannot update wire shape when not in connecting state');
@@ -806,7 +842,12 @@ class CircuitEditor {
           this.startPanning();
         }
       } else if (this.toolState === EditorToolState.Simulate) {
-        // TODO(radu): Determine when clicking on element and toggling
+        const target = this.getElementAtMouse();
+        if (target) {
+          this.toggleElement(target);
+        } else {
+          this.startPanning();
+        }
       }
     }
   }

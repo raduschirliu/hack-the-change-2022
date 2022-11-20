@@ -4,7 +4,6 @@ import {
   ClientMessageUpdateData,
   ServerUpdateMessage,
 } from '../types';
-import { isServerUpdateMessage } from '../typeGuards';
 import { useEffect, useState } from 'react';
 
 import CircuitCanvas from '../components/circuit-canvas/CircuitCanvas';
@@ -12,6 +11,7 @@ import { CircuitSimulation } from '../circuit/circuitSimulation';
 import { JsonValue } from 'react-use-websocket/dist/lib/types';
 import PartsMenu from '../components/menu/PartsMenu';
 import { ToolsMenu } from '../components/menu/ToolsMenu';
+import { isServerUpdateMessage } from '../typeGuards';
 import { selectUser } from '../app/reducers/user';
 import { updateCircuitState } from '../utils';
 import { useAppSelector } from '../app/hooks';
@@ -130,16 +130,10 @@ export default function DocumentPage() {
 
   // TODO: Write message sending
 
-  const onPlayClick = () => {
-    const simulation = new CircuitSimulation();
-    const solution = simulation.solve();
-    console.log(solution);
-  };
-
   return (
     <>
       <div className="w-screen h-screen overflow-hidden">
-        <ToolsMenu documentId={documentId} onPlayClick={onPlayClick} />
+        <ToolsMenu documentId={documentId} />
         <div className="grid grid-rows-1 grid-cols-[220px,1fr] w-full h-full">
           <PartsMenu createCallback={createElement} />
           <CircuitCanvas

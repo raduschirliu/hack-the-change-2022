@@ -15,13 +15,12 @@ import logo from '../../res/logo.png';
 
 interface IProps {
   documentId: string;
-  onPlayClick: () => void;
 }
 
 const buttonClasses =
   'ml-4 inline-block px-5 py-5 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-violet-500 hover:shadow-lg focus:bg-violet-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-violet-500 active:shadow-lg transition duration-150 ease-in-out';
 
-export function ToolsMenu({ documentId, onPlayClick }: IProps) {
+export function ToolsMenu({ documentId }: IProps) {
   const activeTool = useAppSelector(selectActiveTool);
   const dispatch = useAppDispatch();
 
@@ -97,8 +96,8 @@ export function ToolsMenu({ documentId, onPlayClick }: IProps) {
         data-mdb-ripple-color="light"
         title="Run Simulation"
         className={getButtonClass(EditorTool.Simulate)}
-        // onClick={() => dispatch(setActiveTool(EditorTool.Simulate))}
-        onClick={onPlayClick}
+        onClick={() => dispatch(setActiveTool(EditorTool.Simulate))}
+        // onClick={onPlayClick}
       >
         <Play className="fill-white" />
       </button>
