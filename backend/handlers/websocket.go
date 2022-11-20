@@ -50,15 +50,16 @@ func (h Handler) TestWebsocketHandler(c *gin.Context) {
 	connection.WriteJSON(response)
 
 	client := &sockets.Client{
-		ID:   message.UserId,
-		Conn: connection,
-		Pool: nil,
+		ID:       message.UserId,
+		Conn:     connection,
+		Pool:     nil,
+		Database: h.D,
 	}
 
 	if _, ok := Documents[message.DocumentId]; !ok {
 		docs := database.DocumentsCollection(*h.D)
 		doc, err := docs.GetDocument(message.DocumentId)
-		if err == nil {
+		if err != nil {
 			pool := sockets.NewDocumentServer(message.DocumentId)
 			log.Println("starting new pool for id", message.DocumentId)
 			go pool.Start()
